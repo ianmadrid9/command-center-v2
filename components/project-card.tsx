@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 interface ProjectCardProps {
   id: string;
   name: string;
@@ -7,10 +9,9 @@ interface ProjectCardProps {
   progress: number;
   status: string;
   owner?: string;
-  onClick: () => void;
 }
 
-export function ProjectCard({ id, name, description, progress, status, owner, onClick }: ProjectCardProps) {
+export function ProjectCard({ id, name, description, progress, status, owner }: ProjectCardProps) {
   const statusColor: Record<string, string> = {
     on_track: 'bg-green-500',
     at_risk: 'bg-amber-500',
@@ -20,10 +21,7 @@ export function ProjectCard({ id, name, description, progress, status, owner, on
   const progressColor = progress < 30 ? 'bg-red-500' : progress < 70 ? 'bg-amber-500' : 'bg-green-500';
 
   return (
-    <button 
-      onClick={onClick}
-      className="group card p-5 text-left transition-all hover:border-accent/50 hover:bg-panel cursor-pointer"
-    >
+    <Link href={`/projects/${id}`} className="group card p-5 transition-all hover:border-accent/50 hover:bg-panel">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
@@ -32,11 +30,14 @@ export function ProjectCard({ id, name, description, progress, status, owner, on
           </div>
           {description && <p className="mt-1 text-sm text-muted truncate">{description}</p>}
         </div>
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-slate-800 rounded-lg">
+        <button 
+          className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-slate-800 rounded-lg"
+          title="Open chat"
+        >
           <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
-        </div>
+        </button>
       </div>
 
       <div className="mt-4">
@@ -50,7 +51,7 @@ export function ProjectCard({ id, name, description, progress, status, owner, on
       </div>
 
       {owner && <div className="mt-3 text-xs text-muted">Owner: {owner}</div>}
-    </button>
+    </Link>
   );
 }
 

@@ -5,6 +5,10 @@
 :root {
   --background: #0f172a;
   --foreground: #f1f5f9;
+  --panel: #1e293b;
+  --border: #334155;
+  --accent: #38bdf8;
+  --muted: #94a3b8;
 }
 
 body {
@@ -15,10 +19,36 @@ body {
 
 @layer components {
   .card {
-    @apply rounded-2xl border border-border bg-panel/50;
+    @apply rounded-2xl border;
+    border-color: var(--border);
+    background-color: color-mix(in srgb, var(--panel) 50%, transparent);
   }
   
   .kpi {
     @apply text-3xl font-semibold text-white;
+  }
+  
+  .text-muted {
+    color: var(--muted);
+  }
+  
+  .bg-panel {
+    background-color: var(--panel);
+  }
+  
+  .border-border {
+    border-color: var(--border);
+  }
+  
+  .text-accent {
+    color: var(--accent);
+  }
+  
+  .bg-accent {
+    background-color: var(--accent);
+  }
+  
+  .border-accent {
+    border-color: var(--accent);
   }
 }

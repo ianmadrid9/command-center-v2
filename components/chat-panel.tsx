@@ -98,10 +98,11 @@ export function ChatPanel({ projectId, projectName, onClose }: ChatPanelProps) {
       <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={onClose} />
       
       <div className="fixed right-0 top-0 h-full w-full max-w-md bg-slate-950 border-l border-border z-50 flex flex-col shadow-2xl">
+        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex-1 min-w-0">
             <h2 className="font-medium truncate">{projectName}</h2>
-            <p className="text-xs text-muted">Conversation</p>
+            <p className="text-xs text-muted">Chat history</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-lg transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,6 +111,7 @@ export function ChatPanel({ projectId, projectName, onClose }: ChatPanelProps) {
           </button>
         </div>
 
+        {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.length === 0 ? (
             <div className="text-center text-muted py-8">
@@ -119,9 +121,13 @@ export function ChatPanel({ projectId, projectName, onClose }: ChatPanelProps) {
           ) : (
             messages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${msg.role === 'user' ? 'bg-accent text-slate-950' : 'bg-slate-800 text-slate-100'}`}>
+                <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+                  msg.role === 'user' ? 'bg-accent text-slate-950' : 'bg-slate-800 text-slate-100'
+                }`}>
                   <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                  <p className={`text-xs mt-1 ${msg.role === 'user' ? 'text-slate-700' : 'text-muted'}`}>{formatTime(msg.createdAt)}</p>
+                  <p className={`text-xs mt-1 ${
+                    msg.role === 'user' ? 'text-slate-700' : 'text-muted'
+                  }`}>{formatTime(msg.createdAt)}</p>
                 </div>
               </div>
             ))
@@ -138,6 +144,7 @@ export function ChatPanel({ projectId, projectName, onClose }: ChatPanelProps) {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Input */}
         <form onSubmit={sendMessage} className="p-4 border-t border-border">
           <div className="flex gap-2">
             <input
@@ -147,7 +154,11 @@ export function ChatPanel({ projectId, projectName, onClose }: ChatPanelProps) {
               className="flex-1 rounded-xl border border-border bg-slate-900 px-4 py-3 text-sm outline-none focus:border-accent transition-colors"
               autoFocus
             />
-            <button type="submit" disabled={loading || !input.trim()} className="px-4 py-3 rounded-xl bg-accent text-slate-950 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity">
+            <button 
+              type="submit" 
+              disabled={loading || !input.trim()} 
+              className="px-4 py-3 rounded-xl bg-accent text-slate-950 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+            >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
