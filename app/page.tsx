@@ -11,22 +11,7 @@ import { QuickActions } from '@/components/dashboard/quick-actions';
 import { SystemCapacity } from '@/components/dashboard/system-capacity';
 import { EventbriteMonitor } from '@/components/dashboard/eventbrite-monitor';
 import { TranscriptExtractor } from '@/components/dashboard/transcript-extractor';
-import { 
-  mockTasks, 
-  mockSubagents, 
-  mockActivities, 
-  mockHealth, 
-  mockQuickActions,
-  mockEventbriteEvents,
-  mockTranscripts,
-  getTaskStats,
-  getSubagentStats,
-  getTikTokStats,
-  getRecentComments,
-  getLinkedInStats,
-  getRecentLinkedInComments,
-  getRecentTranscripts
-} from '@/lib/mockData';
+import { fetchTikTokStats, fetchLinkedInStats, fetchTikTokComments, fetchLinkedInComments, mockHealth, mockQuickActions, mockEventbriteEvents, mockTranscripts, getTaskStats, getSubagentStats } from '@/lib/mockData';
 
 export default function Dashboard() {
   const [useMockData, setUseMockData] = useState(true);
@@ -37,9 +22,9 @@ export default function Dashboard() {
   const subagentStats = getSubagentStats();
   const tiktokStats = getTikTokStats();
   const linkedInStats = getLinkedInStats();
-  const recentComments = getRecentComments(8);
-  const recentLinkedInComments = getRecentLinkedInComments(6);
-  const recentTranscripts = getRecentTranscripts(5);
+  const recentComments = fetchTikTokComments().slice(0, 8);
+  const recentLinkedInComments = fetchLinkedInComments().slice(0, 6);
+  const recentTranscripts = mockTranscripts.slice(0, 5);
 
   function handleQuickAction(action: string) {
     console.log('Quick action:', action);
@@ -87,7 +72,7 @@ export default function Dashboard() {
 
       {/* Dev Agents - Full Width Row */}
       <div>
-        <DevAgentsKpi subagents={mockSubagents} />
+        <DevAgentsKpi />
       </div>
 
       {/* Life Goals - Full Width Row */}
@@ -233,12 +218,12 @@ export default function Dashboard() {
 
       {/* System Capacity - Full Width */}
       <div className="space-y-4">
-        <SystemCapacity health={mockHealth} currentAgents={mockSubagents.filter(s => s.status === 'running').length} />
+        <SystemCapacity health={mockHealth} currentAgents={subagentStats.running} />
       </div>
 
       {/* Activity Feed & Quick Actions - Full Width Stacked */}
       <div className="space-y-4">
-        <ActivityFeed activities={mockActivities} />
+        <ActivityFeed activities={[]} />
         <QuickActions actions={mockQuickActions} onAction={handleQuickAction} />
       </div>
     </div>

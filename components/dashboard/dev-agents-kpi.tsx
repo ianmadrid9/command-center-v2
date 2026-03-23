@@ -2,23 +2,40 @@
 
 import { useState, useEffect } from 'react';
 import { Subagent } from '@/lib/mockData';
+import { fetchSubagents, runAgent, fetchRSVPs } from '@/lib/api';
 import { SubagentChat } from './subagent-chat';
 
-interface DevAgentsKpiProps {
-  subagents: Subagent[];
-}
-
-export function DevAgentsKpi({ subagents }: DevAgentsKpiProps) {
+export function DevAgentsKpi() {
   const [showChat, setShowChat] = useState(false);
   const [isRunningRSVP, setIsRunningRSVP] = useState(false);
   const [rsvpCount, setRsvpCount] = useState<number | null>(null);
+  const [subagents, setSubagents] = useState<Subagent[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Load RSVP count on mount
+  // Load subagents and RSVP count
   useEffect(() => {
-    fetch('/api/rsvps')
-      .then(res => res.json())
-      .then(data => setRsvpCount(data.total_count || 0))
-      .catch(() => setRsvpCount(0));
+    async function loadData() {
+      try {
+        const [agents, rsvps] = await Promise.all([
+          fetchSubagents(),
+          fetchRSVPs(),
+        ]);
+        setSubagents(agents);
+        setRsvpCount(rsvps.total_count);
+      } catch (error) {
+        console.error('Failed to load agents:', error);
+        setSubagents([]);
+        setRsvpCount(0);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    loadData();
+    
+    // Refresh every 30 seconds
+    const interval = setInterval(loadData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const total = subagents.length;
@@ -31,15 +48,10 @@ export function DevAgentsKpi({ subagents }: DevAgentsKpiProps) {
   async function triggerRSVP() {
     setIsRunningRSVP(true);
     try {
-      const response = await fetch('/api/agents/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ agent: 'eventbrite-rsvp' })
-      });
-      const result = await response.json();
+      const result = await runAgent('eventbrite-rsvp');
       if (result.success) {
-        setRsvpCount(result.rsvps?.length || rsvpCount! + 1);
-        alert(`✅ RSVP agent completed! Grabbed ${result.rsvps?.length || 0} tickets.`);
+        setRsvpCount((result.rsvps || 0));
+        alert(`✅ RSVP agent completed! Grabbed ${result.rsvps || 0} tickets.`);
       } else {
         alert(`⚠️ ${result.error || 'RSVP agent failed'}`);
       }
@@ -48,6 +60,20 @@ export function DevAgentsKpi({ subagents }: DevAgentsKpiProps) {
     } finally {
       setIsRunningRSVP(false);
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="card p-5 w-full">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-3xl">🤖</span>
+          <div>
+            <h3 className="font-semibold text-lg">Dev Agents</h3>
+            <p className="text-sm text-muted">Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Subagent } from '@/lib/mockData';
+import { sendAgentMessage } from '@/lib/api';
 
 interface SubagentChatProps {
   subagents: Subagent[];
@@ -82,7 +83,7 @@ export function SubagentChat({ subagents, isOpen, onClose }: SubagentChatProps) 
     }
   }, [isOpen, onClose]);
 
-  function handleSend(e?: React.FormEvent) {
+  async function handleSend(e?: React.FormEvent) {
     e?.preventDefault();
     if (!input.trim() || !selectedAgent) return;
 
@@ -97,13 +98,15 @@ export function SubagentChat({ subagents, isOpen, onClose }: SubagentChatProps) 
     setInput('');
     setIsAgentTyping(true);
 
-    // Agent responds
-    setTimeout(() => {
+    try {
+      // Send message to agent API
+      const result = await sendAgentMessage(selectedAgent.id, input);
+      
       const agentMsg: Message = {
         id: (Date.now() + 1).toString(),
         type: 'agent',
         sender: selectedAgent.name,
-        text: `Got it! I'll work on "${input}". Give me a few minutes and I'll update you.`,
+        text: result.response,
         timestamp: new Date().toISOString(),
       };
       setMessages(prev => [...prev, agentMsg]);
@@ -120,7 +123,18 @@ export function SubagentChat({ subagents, isOpen, onClose }: SubagentChatProps) 
         };
         setMessages(prev => [...prev, assistantMsg]);
       }, 800);
-    }, 1000);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      const errorMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'agent',
+        sender: selectedAgent.name,
+        text: `Sorry, I encountered an error. Please try again.`,
+        timestamp: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, errorMsg]);
+      setIsAgentTyping(false);
+    }
   }
 
   function formatTime(timestamp: string) {
@@ -200,132 +214,149 @@ export function SubagentChat({ subagents, isOpen, onClose }: SubagentChatProps) 
                     selectedAgent.status === 'failed' ? 'bg-red-500' :
                     'bg-gray-500'
                   }`} />
-                  <h4 className="font-semibold">{selectedAgent.name}</h4>
+                  <span className="text-sm font-medium">{selectedAgent.name}</span>
                 </div>
 
-                {/* Status Badge */}
-                <div className={`mb-4 p-2 rounded-lg border text-xs ${getStatusColor(selectedAgent.status)}`}>
-                  <p className="font-medium capitalize">{selectedAgent.status.replace('-', ' ')}</p>
-                </div>
-
-                {/* Current Task */}
-                <div className="mb-4">
-                  <p className="text-xs text-muted font-medium mb-1">Current Task</p>
-                  <p className="text-sm">{selectedAgent.task}</p>
-                </div>
-
-                {/* Progress */}
-                {selectedAgent.status === 'running' && selectedAgent.progress < 100 && (
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-muted">Progress</span>
-                      <span className="text-accent">{selectedAgent.progress}%</span>
-                    </div>
-                    <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
-                      <div
-                        className="h-2 rounded-full bg-accent"
-                        style={{ width: `${selectedAgent.progress}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* ETA */}
-                {selectedAgent.eta && selectedAgent.eta !== '-' && (
-                  <div className="mb-4 p-3 rounded-lg bg-slate-900/50">
-                    <p className="text-xs text-muted mb-1">Estimated Time</p>
-                    <p className="text-sm font-medium">{selectedAgent.eta}</p>
-                  </div>
-                )}
-
-                {/* Tech Stack */}
-                {selectedAgent.techStack && selectedAgent.techStack.length > 0 && (
-                  <div className="mb-4">
-                    <p className="text-xs text-muted font-medium mb-2">Tech Stack</p>
-                    <div className="flex flex-wrap gap-1">
-                      {selectedAgent.techStack.map((tech, i) => (
-                        <span key={i} className="text-xs px-2 py-0.5 rounded bg-slate-800 text-muted">
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Features */}
-                {selectedAgent.features && selectedAgent.features.length > 0 && (
+                <div className="space-y-3 text-sm">
                   <div>
-                    <p className="text-xs text-muted font-medium mb-2">Features</p>
-                    <ul className="space-y-1">
-                      {selectedAgent.features.map((feature, i) => (
-                        <li key={i} className="text-xs flex items-start gap-1.5">
-                          <span className="text-green-400 mt-0.5">✓</span>
-                          <span className="text-muted">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <p className="text-xs text-muted mb-1">Task</p>
+                    <p className="text-foreground">{selectedAgent.task}</p>
                   </div>
-                )}
+
+                  {selectedAgent.techStack && selectedAgent.techStack.length > 0 && (
+                    <div>
+                      <p className="text-xs text-muted mb-1">Tech Stack</p>
+                      <div className="flex flex-wrap gap-1">
+                        {selectedAgent.techStack.map((tech, i) => (
+                          <span key={i} className="px-2 py-0.5 rounded bg-slate-800 text-xs">
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedAgent.features && selectedAgent.features.length > 0 && (
+                    <div>
+                      <p className="text-xs text-muted mb-1">Features</p>
+                      <ul className="space-y-0.5">
+                        {selectedAgent.features.map((feature, i) => (
+                          <li key={i} className="text-foreground text-xs">• {feature}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {selectedAgent.status === 'running' && (
+                    <>
+                      <div>
+                        <p className="text-xs text-muted mb-1">Progress</p>
+                        <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
+                          <div
+                            className="h-2 rounded-full bg-accent"
+                            style={{ width: `${selectedAgent.progress}%` }}
+                          />
+                        </div>
+                        <p className="text-xs text-muted mt-1">{selectedAgent.progress}% complete</p>
+                      </div>
+
+                      {selectedAgent.eta && (
+                        <div>
+                          <p className="text-xs text-muted mb-1">ETA</p>
+                          <p className="text-foreground">{selectedAgent.eta}</p>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {selectedAgent.previewUrl && (
+                    <div>
+                      <p className="text-xs text-muted mb-1">Preview</p>
+                      <a
+                        href={selectedAgent.previewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-accent hover:underline text-xs"
+                      >
+                        {selectedAgent.previewUrl}
+                      </a>
+                    </div>
+                  )}
+
+                  {selectedAgent.repoUrl && (
+                    <div>
+                      <p className="text-xs text-muted mb-1">Repository</p>
+                      <a
+                        href={selectedAgent.repoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-accent hover:underline text-xs"
+                      >
+                        {selectedAgent.repoUrl}
+                      </a>
+                    </div>
+                  )}
+                </div>
               </>
             )}
           </div>
 
           {/* Right: Chat */}
-          <div className="w-2/3 flex flex-col min-h-0">
+          <div className="flex-1 flex flex-col min-h-0">
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
                   className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <div className="max-w-[80%]">
-                    {msg.type !== 'user' && (
-                      <p className="text-xs text-muted mb-1">{msg.sender}</p>
+                  <div
+                    className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                      msg.type === 'user'
+                        ? 'bg-accent text-slate-950 rounded-br-md'
+                        : msg.type === 'assistant'
+                        ? 'bg-purple-500/20 border border-purple-500/30 text-purple-100 rounded-bl-md'
+                        : 'bg-slate-800 text-foreground rounded-bl-md'
+                    }`}
+                  >
+                    {msg.sender && msg.type !== 'user' && (
+                      <p className="text-xs font-medium mb-0.5 opacity-70">{msg.sender}</p>
                     )}
-                    <div
-                      className={`rounded-2xl px-4 py-3 ${
-                        msg.type === 'user'
-                          ? 'bg-accent text-slate-950'
-                          : msg.type === 'assistant'
-                          ? 'bg-purple-500/20 text-purple-200 border border-purple-500/30'
-                          : 'bg-slate-800 text-foreground'
-                      }`}
-                    >
-                      <p className="text-sm">{msg.text}</p>
-                      <p className={`text-xs mt-1 ${
-                        msg.type === 'user' ? 'text-slate-700' : 'text-muted'
-                      }`}>
-                        {formatTime(msg.timestamp)}
-                      </p>
-                    </div>
+                    <p className="text-sm">{msg.text}</p>
+                    <p className="text-xs opacity-50 mt-1">{formatTime(msg.timestamp)}</p>
                   </div>
                 </div>
               ))}
+              
               {isAgentTyping && (
                 <div className="flex justify-start">
-                  <div className="bg-slate-800 rounded-2xl px-4 py-3">
-                    <span className="animate-pulse">typing...</span>
+                  <div className="bg-slate-800 rounded-2xl rounded-bl-md px-4 py-2">
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <div className="w-2 h-2 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <div className="w-2 h-2 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
                   </div>
                 </div>
               )}
+              
               <div ref={messagesEndRef} />
             </div>
 
             {/* Input */}
-            <form onSubmit={handleSend} className="p-4 border-t border-border">
-              <div className="flex items-center gap-2">
+            <form onSubmit={handleSend} className="p-4 border-t border-border flex-shrink-0">
+              <div className="flex gap-2">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={`Message ${selectedAgent?.name || 'agent'}...`}
-                  className="flex-1 rounded-xl border border-border bg-slate-900 px-4 py-2 text-sm outline-none focus:border-accent"
+                  placeholder="Type a message..."
+                  className="flex-1 bg-slate-900 border border-border rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-accent/50"
                 />
                 <button
                   type="submit"
-                  disabled={!input.trim()}
-                  className="px-4 py-2 rounded-xl bg-accent text-slate-950 font-medium text-sm hover:bg-accent/90 transition-colors disabled:opacity-50"
+                  disabled={!input.trim() || isAgentTyping}
+                  className="px-4 py-2 bg-accent text-slate-950 rounded-lg text-sm font-medium hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Send
                 </button>
