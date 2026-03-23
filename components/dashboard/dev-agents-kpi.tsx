@@ -94,7 +94,10 @@ export function DevAgentsKpi() {
         {agents.map((agent) => (
           <div
             key={agent.agentId}
-            className="flex items-center justify-between p-3 rounded-xl bg-slate-900/50 border border-border/50 hover:border-accent/50 transition-colors"
+            onClick={() => agent.agentId === 'eventbrite' && setSelectedAgent('eventbrite')}
+            className={`flex items-center justify-between p-3 rounded-xl bg-slate-900/50 border border-border/50 transition-colors ${
+              agent.agentId === 'eventbrite' ? 'cursor-pointer hover:border-accent/50' : ''
+            }`}
           >
             <div className="flex items-center gap-3">
               <span className="text-xl">{getStatusIcon(agent.status)}</span>
@@ -111,12 +114,6 @@ export function DevAgentsKpi() {
               </span>
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-  </div>
         ))}
       </div>
 
