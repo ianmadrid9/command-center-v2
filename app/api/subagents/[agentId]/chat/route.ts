@@ -4,10 +4,50 @@ import path from 'path';
 
 const STATE_FILE = path.join(process.cwd(), 'data', 'subagents.json');
 
+// Ensure state file exists
+async function ensureStateFile() {
+  try {
+    await fs.access(STATE_FILE);
+  } catch {
+    const defaultData = {
+      agents: [
+        {
+          id: 'eventbrite-scout',
+          name: 'eventbrite-scout',
+          task: 'Researching meetups & events on Eventbrite',
+          status: 'idle',
+          progress: 0,
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: 'eventbrite-rsvp',
+          name: 'eventbrite-rsvp',
+          task: 'Auto-RSVP to free & early-bird events',
+          status: 'idle',
+          progress: 0,
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: 'transcript-bot',
+          name: 'transcript-bot',
+          task: 'Extracting transcripts from TikTok & YouTube',
+          status: 'idle',
+          progress: 0,
+          createdAt: new Date().toISOString(),
+        },
+      ],
+      conversations: {},
+    };
+    await fs.writeFile(STATE_FILE, JSON.stringify(defaultData, null, 2));
+  }
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ agentId: string }> }
 ) {
+  await ensureStateFile();
+  
   try {
     const { message } = await request.json();
     const { agentId } = await params;
@@ -42,7 +82,7 @@ export async function POST(
     };
     data.conversations[agentId].push(userMessage);
     
-    // Generate agent response (simple echo for now, can be enhanced with AI)
+    // Generate agent response
     const agentResponses = [
       `Got it! I'll work on "${message}". Give me a few minutes and I'll update you.`,
       `Understood! Processing your request now.`,
@@ -90,6 +130,8 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ agentId: string }> }
 ) {
+  await ensureStateFile();
+  
   try {
     const { agentId } = await params;
     

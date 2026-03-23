@@ -36,3 +36,33 @@ model Message {
   createdAt      DateTime     @default(now())
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }
+
+// Subagent conversations
+model Subagent {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  task        String
+  status      String      @default("idle")
+  progress    Int         @default(0)
+  startedAt   DateTime?
+  eta         String?
+  projectType String?
+  techStack   String?     // JSON array
+  features    String?     // JSON array
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  messages    AgentMessage[]
+}
+
+model AgentMessage {
+  id        String    @id @default(cuid())
+  agentId   String
+  type      String    // 'user' | 'agent' | 'assistant'
+  sender    String?
+  text      String
+  createdAt DateTime  @default(now())
+  agent     Subagent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  
+  @@index([agentId])
+  @@index([createdAt])
+}

@@ -49,6 +49,7 @@ async function initStateFile() {
       },
     ];
     
+    await fs.mkdir(path.dirname(STATE_FILE), { recursive: true });
     await fs.writeFile(STATE_FILE, JSON.stringify({ agents: defaultAgents, conversations: {} }, null, 2));
   }
 }
