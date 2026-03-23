@@ -1,0 +1,41 @@
+{
+  "agents": [
+    {
+      "id": "eventbrite-scout",
+      "name": "eventbrite-scout",
+      "task": "Researching meetups & events on Eventbrite",
+      "status": "idle",
+      "progress": 0,
+      "eta": "on-demand",
+      "projectType": "app",
+      "techStack": ["Eventbrite API", "Node.js", "Cron"],
+      "features": ["Daily event scraping", "Categorization by date", "Price filtering", "Location mapping"],
+      "createdAt": "2026-03-23T18:00:00.000Z"
+    },
+    {
+      "id": "eventbrite-rsvp",
+      "name": "eventbrite-rsvp",
+      "task": "Auto-RSVP to free & early-bird events",
+      "status": "idle",
+      "progress": 0,
+      "eta": "on-demand",
+      "projectType": "app",
+      "techStack": ["Eventbrite API", "Node.js", "Auto-registration"],
+      "features": ["Free ticket detection", "Early-bird grabber (≤$15)", "Auto-RSVP", "Order tracking"],
+      "createdAt": "2026-03-23T18:00:00.000Z"
+    },
+    {
+      "id": "transcript-bot",
+      "name": "transcript-bot",
+      "task": "Extracting transcripts from TikTok & YouTube",
+      "status": "idle",
+      "progress": 0,
+      "eta": "on-demand",
+      "projectType": "app",
+      "techStack": ["Whisper API", "YouTube Transcript API", "TikTok Scraper"],
+      "features": ["Auto transcript extraction", "One-click copy", "Multi-platform support", "Language detection"],
+      "createdAt": "2026-03-23T18:00:00.000Z"
+    }
+  ],
+  "conversations": {}
+}
