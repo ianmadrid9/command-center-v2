@@ -155,7 +155,7 @@ function generateSmartResponse(messages: Array<{ role: string; content: string }
     return "Send me the URL and I'll extract the full transcript with timestamps and key points!";
   }
   
-  if (lower.includes('how are you') || lower.includes('how's it going')) {
+  if (lower.includes('how are you') || lower.includes('how is it going')) {
     return "Doing great! Ready to tackle some tasks. What do you need?";
   }
   
