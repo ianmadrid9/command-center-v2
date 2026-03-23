@@ -9,25 +9,64 @@
 
 ## Configure in Command Center
 
+### Required Environment Variables
+
+```bash
+# API access
+EVENTBRITE_API_KEY=your_api_key_here
+
+# For auto-RSVP (required to grab tickets)
+EVENTBRITE_USER_EMAIL=your@email.com
+EVENTBRITE_USER_NAME=Your Full Name
+```
+
 ### Option 1: Local .env file (for testing)
 
 ```bash
 cd /Users/spm/.openclaw/workspace/command-center
 cp .env.example .env
-echo "EVENTBRITE_API_KEY=YOUR_KEY_HERE" >> .env
+# Edit .env and add your credentials
 ```
 
 ### Option 2: Gateway environment (recommended for production)
 
 ```bash
-openclaw env set EVENTBRITE_API_KEY=YOUR_KEY_HERE
+openclaw env set EVENTBRITE_API_KEY=your_key_here
+openclaw env set EVENTBRITE_USER_EMAIL=your@email.com
+openclaw env set EVENTBRITE_USER_NAME="Ian Madrid"
 ```
 
-## Test the Agent
+## Usage
 
+### Manual Run
+
+**Scout only** (fetch events with ticket data):
 ```bash
 cd /Users/spm/.openclaw/workspace/command-center
 node agents/eventbrite-scout.js
+```
+
+**RSVP only** (grab tickets from existing events):
+```bash
+node agents/eventbrite-rsvp.js
+```
+
+**Auto-Scout & RSVP** (recommended - runs both in sequence):
+```bash
+node agents/eventbrite-auto.js
+```
+
+### Automated (Cron)
+
+Run every 6 hours to catch early bird tickets:
+```bash
+# Add to crontab (crontab -e)
+0 */6 * * * cd /Users/spm/.openclaw/workspace/command-center && node agents/eventbrite-auto.js >> ~/eventbrite-auto.log 2>&1
+```
+
+Or use the setup script:
+```bash
+./setup-cron.sh
 ```
 
 ## What Changed
