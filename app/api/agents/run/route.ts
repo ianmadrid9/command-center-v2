@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { exec } from 'child_process';
 import path from 'path';
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const { agent } = await request.json();
     
@@ -32,16 +32,16 @@ export async function POST(request: NextRequest) {
     console.log(`Script: ${script}`);
     
     // Run the agent script
-    return new Promise((resolve) => {
+    const result = await new Promise<{ success: boolean; rsvps?: number; agent?: string; stdout?: string; stderr?: string; error?: string }>((resolve) => {
       exec(`node "${script}"`, (error, stdout, stderr) => {
         if (error) {
           console.error(`Agent error:`, error);
-          resolve(NextResponse.json({
+          resolve({
             success: false,
             error: error.message,
             stdout: stdout,
             stderr: stderr
-          }, { status: 500 }));
+          });
           return;
         }
         
@@ -49,15 +49,17 @@ export async function POST(request: NextRequest) {
         const rsvpMatch = stdout.match(/✅ Successfully RSVP'd to (\d+) event\(s\)/);
         const rsvpCount = rsvpMatch ? parseInt(rsvpMatch[1]) : 0;
         
-        resolve(NextResponse.json({
+        resolve({
           success: true,
           agent,
           rsvps: rsvpCount,
           stdout: stdout,
           stderr: stderr
-        }));
+        });
       });
     });
+    
+    return NextResponse.json(result);
     
   } catch (error) {
     console.error('Failed to run agent:', error);
