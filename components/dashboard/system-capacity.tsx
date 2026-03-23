@@ -1,7 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { SystemHealth } from '@/lib/mockData';
+import { useState } from 'react';
+
+interface SystemHealth {
+  cpu: number;
+  memory: number;
+  disk: number;
+  uptime: string;
+  status: 'healthy' | 'warning' | 'critical';
+}
 
 interface SystemCapacityProps {
   health: SystemHealth;
@@ -13,14 +20,14 @@ export function SystemCapacity({ health, currentAgents }: SystemCapacityProps) {
   const [dashboardStatus, setDashboardStatus] = useState<'online' | 'offline' | 'checking'>('checking');
   
   // Check dashboard server status
-  useEffect(() => {
+  useState(() => {
     fetch('/api/eventbrite')
       .then(res => {
         if (res.ok) setDashboardStatus('online');
         else setDashboardStatus('offline');
       })
       .catch(() => setDashboardStatus('offline'));
-  }, []);
+  });
   
   // Calculate available capacity
   const cpuAvailable = 100 - health.cpu;

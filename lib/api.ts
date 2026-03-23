@@ -287,3 +287,18 @@ export async function createTask(data: { title: string; priority?: string }): Pr
   const result = await res.json();
   return result.task;
 }
+
+// ============ MOCK DATA HELPERS (for components without backend yet) ============
+
+// Re-export from mockData for components that still need it
+export {
+  getTikTokStats,
+  getLinkedInStats,
+  getRecentComments,
+  getRecentLinkedInComments,
+  mockQuickActions,
+  mockTranscripts,
+  getTaskStats,
+  getSubagentStats,
+  mockEventbriteEvents,
+} from './mockData';

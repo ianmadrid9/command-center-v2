@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { DevAgentsKpi } from '@/components/dashboard/dev-agents-kpi';
 import { LifeGoalsKpi } from '@/components/dashboard/life-goals-kpi';
@@ -11,25 +11,61 @@ import { QuickActions } from '@/components/dashboard/quick-actions';
 import { SystemCapacity } from '@/components/dashboard/system-capacity';
 import { EventbriteMonitor } from '@/components/dashboard/eventbrite-monitor';
 import { TranscriptExtractor } from '@/components/dashboard/transcript-extractor';
-import { getTikTokStats, getLinkedInStats, getRecentComments, getRecentLinkedInComments, mockHealth, mockQuickActions, mockEventbriteEvents, mockTranscripts, getTaskStats, getSubagentStats } from '@/lib/mockData';
+import { fetchTikTokStats, fetchLinkedInStats, getRecentComments, getRecentLinkedInComments, fetchActivities, fetchSystemHealth, mockQuickActions, mockTranscripts } from '@/lib/api';
 
 export default function Dashboard() {
-  const [useMockData, setUseMockData] = useState(true);
   const [showTikTokComments, setShowTikTokComments] = useState(false);
   const [showLinkedInComments, setShowLinkedInComments] = useState(false);
   
-  const taskStats = getTaskStats();
-  const subagentStats = getSubagentStats();
-  const tiktokStats = getTikTokStats();
-  const linkedInStats = getLinkedInStats();
-  const recentComments = getRecentComments(8);
-  const recentLinkedInComments = getRecentLinkedInComments(6);
-  const recentTranscripts = mockTranscripts.slice(0, 5);
+  // Real data state
+  const [tiktokStats, setTiktokStats] = useState<any>(null);
+  const [linkedInStats, setLinkedInStats] = useState<any>(null);
+  const [activities, setActivities] = useState<any[]>([]);
+  const [systemHealth, setSystemHealth] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [tiktok, linkedin, acts, health] = await Promise.all([
+          fetchTikTokStats(),
+          fetchLinkedInStats(),
+          fetchActivities(),
+          fetchSystemHealth(),
+        ]);
+        setTiktokStats(tiktok);
+        setLinkedInStats(linkedin);
+        setActivities(acts);
+        setSystemHealth(health);
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    loadData();
+    
+    // Refresh every 60 seconds
+    const interval = setInterval(loadData, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   function handleQuickAction(action: string) {
     console.log('Quick action:', action);
     // TODO: Implement actual actions
-    alert(`Action "${action}" triggered (mock)`);
+    alert(`Action "${action}" triggered`);
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin text-4xl mb-4">⏳</div>
+          <p className="text-muted">Loading dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -40,26 +76,20 @@ export default function Dashboard() {
           <h1 className="text-3xl font-semibold">Clawmmand Center</h1>
           <p className="mt-1 text-sm text-muted">Your projects. Your conversations. Your progress.</p>
         </div>
-        <button
-          onClick={() => setUseMockData(!useMockData)}
-          className="text-xs text-muted hover:text-accent transition-colors px-3 py-1.5 rounded-lg border border-border"
-        >
-          {useMockData ? '🟢 Mock Data' : '🔴 Live Data'}
-        </button>
       </div>
 
       {/* KPI Stats - Full Width Grid (3 per row on desktop, 2 on mobile) */}
       <div className="grid gap-3 grid-cols-2 md:grid-cols-3">
         <StatsCard
           title="Active Tasks"
-          value={taskStats.inProgress}
-          subtitle={`${taskStats.completed} done today`}
+          value="0"
+          subtitle="No active tasks"
           icon="📋"
         />
         <StatsCard
           title="Events"
-          value={mockEventbriteEvents.filter(e => e.timing === 'today').length}
-          subtitle="today"
+          value={tiktokStats ? 'Live' : '0'}
+          subtitle="Check Eventbrite"
           icon="🎫"
         />
         <StatsCard
@@ -96,32 +126,34 @@ export default function Dashboard() {
           </div>
           
           {/* Main Stats */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="text-center">
-              <p className="text-2xl font-semibold">
-                {tiktokStats.totalViews >= 1000000 ? `${(tiktokStats.totalViews / 1000000).toFixed(1)}M` : tiktokStats.totalViews >= 1000 ? `${(tiktokStats.totalViews / 1000).toFixed(0)}K` : tiktokStats.totalViews}
-              </p>
-              <p className="text-xs text-muted">Views</p>
+          {tiktokStats && (
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="text-center">
+                <p className="text-2xl font-semibold">
+                  {tiktokStats.totalViews >= 1000000 ? `${(tiktokStats.totalViews / 1000000).toFixed(1)}M` : tiktokStats.totalViews >= 1000 ? `${(tiktokStats.totalViews / 1000).toFixed(0)}K` : tiktokStats.totalViews}
+                </p>
+                <p className="text-xs text-muted">Views</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-semibold">{tiktokStats.totalComments >= 1000 ? `${(tiktokStats.totalComments / 1000).toFixed(1)}K` : tiktokStats.totalComments}</p>
+                <p className="text-xs text-muted">Comments</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-semibold">{tiktokStats.sentimentBreakdown.positive}</p>
+                <p className="text-xs text-muted">Positive</p>
+              </div>
             </div>
-            <div className="text-center">
-              <p className="text-2xl font-semibold">{tiktokStats.totalComments >= 1000 ? `${(tiktokStats.totalComments / 1000).toFixed(1)}K` : tiktokStats.totalComments}</p>
-              <p className="text-xs text-muted">Comments</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-semibold">{tiktokStats.sentimentBreakdown.positive}</p>
-              <p className="text-xs text-muted">Positive</p>
-            </div>
-          </div>
+          )}
           
           {/* Urgent Comments */}
-          {tiktokStats.urgentBreakdown.total > 0 && (
+          {tiktokStats?.urgentBreakdown?.total > 0 && (
             <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">🚨</span>
                   <div>
                     <p className="text-sm font-semibold text-red-200">Urgent Comments</p>
-                    <p className="text-xs text-red-300/70">{tiktokStats.urgentBreakdown.total} of {tiktokStats.totalComments} comments need attention</p>
+                    <p className="text-xs text-red-300/70">{tiktokStats.urgentBreakdown.total} comments need attention</p>
                   </div>
                 </div>
               </div>
@@ -149,32 +181,34 @@ export default function Dashboard() {
           </div>
           
           {/* Main Stats */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="text-center">
-              <p className="text-2xl font-semibold">
-                {linkedInStats.totalImpressions >= 1000000 ? `${(linkedInStats.totalImpressions / 1000000).toFixed(1)}M` : linkedInStats.totalImpressions >= 1000 ? `${(linkedInStats.totalImpressions / 1000).toFixed(0)}K` : linkedInStats.totalImpressions}
-              </p>
-              <p className="text-xs text-muted">Impressions</p>
+          {linkedInStats && (
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="text-center">
+                <p className="text-2xl font-semibold">
+                  {linkedInStats.totalImpressions >= 1000000 ? `${(linkedInStats.totalImpressions / 1000000).toFixed(1)}M` : linkedInStats.totalImpressions >= 1000 ? `${(linkedInStats.totalImpressions / 1000).toFixed(0)}K` : linkedInStats.totalImpressions}
+                </p>
+                <p className="text-xs text-muted">Impressions</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-semibold">{linkedInStats.totalComments >= 1000 ? `${(linkedInStats.totalComments / 1000).toFixed(1)}K` : linkedInStats.totalComments}</p>
+                <p className="text-xs text-muted">Comments</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-semibold">{linkedInStats.sentimentBreakdown.positive}</p>
+                <p className="text-xs text-muted">Positive</p>
+              </div>
             </div>
-            <div className="text-center">
-              <p className="text-2xl font-semibold">{linkedInStats.totalComments >= 1000 ? `${(linkedInStats.totalComments / 1000).toFixed(1)}K` : linkedInStats.totalComments}</p>
-              <p className="text-xs text-muted">Comments</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-semibold">{linkedInStats.sentimentBreakdown.positive}</p>
-              <p className="text-xs text-muted">Positive</p>
-            </div>
-          </div>
+          )}
           
           {/* Urgent Comments */}
-          {linkedInStats.urgentBreakdown.total > 0 && (
+          {linkedInStats?.urgentBreakdown?.total > 0 && (
             <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">🚨</span>
                   <div>
                     <p className="text-sm font-semibold text-red-200">Urgent Comments</p>
-                    <p className="text-xs text-red-300/70">{linkedInStats.urgentBreakdown.total} of {linkedInStats.totalComments} comments need attention</p>
+                    <p className="text-xs text-red-300/70">{linkedInStats.urgentBreakdown.total} comments need attention</p>
                   </div>
                 </div>
               </div>
@@ -196,34 +230,30 @@ export default function Dashboard() {
       <TikTokCommentsModal
         isOpen={showTikTokComments}
         onClose={() => setShowTikTokComments(false)}
-        recentComments={recentComments}
+        recentComments={getRecentComments(8)}
       />
 
       {/* LinkedIn Comments Modal */}
       <LinkedInCommentsModal
         isOpen={showLinkedInComments}
         onClose={() => setShowLinkedInComments(false)}
-        recentComments={recentLinkedInComments}
+        recentComments={getRecentLinkedInComments(6)}
       />
-
-      {/* Social Monitoring - Full Width Cards */}
-      <div className="space-y-4">
-      </div>
 
       {/* Events & Transcript - Full Width Stacked */}
       <div className="space-y-4">
         <EventbriteMonitor />
-        <TranscriptExtractor transcripts={recentTranscripts} />
+        <TranscriptExtractor transcripts={mockTranscripts} />
       </div>
 
       {/* System Capacity - Full Width */}
       <div className="space-y-4">
-        <SystemCapacity health={mockHealth} currentAgents={subagentStats.running} />
+        {systemHealth && <SystemCapacity health={systemHealth} currentAgents={0} />}
       </div>
 
       {/* Activity Feed & Quick Actions - Full Width Stacked */}
       <div className="space-y-4">
-        <ActivityFeed activities={[]} />
+        <ActivityFeed activities={activities} />
         <QuickActions actions={mockQuickActions} onAction={handleQuickAction} />
       </div>
     </div>

@@ -1,34 +1,33 @@
 import { NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
 
-const ACTIVITIES_FILE = path.join(process.cwd(), 'data', 'activities.json');
-
-// Initialize activities file
-async function initActivitiesFile() {
-  try {
-    await fs.access(ACTIVITIES_FILE);
-  } catch {
-    // Create with empty activities
-    await fs.writeFile(ACTIVITIES_FILE, JSON.stringify({ activities: [] }, null, 2));
-  }
-}
+// In-memory activity storage (Vercel-compatible)
+const activities: Array<{
+  id: string;
+  type: 'deploy' | 'task-complete' | 'agent-spawn' | 'error' | 'info';
+  message: string;
+  timestamp: string;
+  details?: string;
+}> = [
+  // Seed with some initial activities
+  {
+    id: 'act-1',
+    type: 'info',
+    message: 'Command Center initialized',
+    timestamp: new Date().toISOString(),
+    details: 'System ready',
+  },
+];
 
 export async function GET() {
-  await initActivitiesFile();
-  
   try {
-    const fileContents = await fs.readFile(ACTIVITIES_FILE, 'utf-8');
-    const data = JSON.parse(fileContents);
-    
     // Return last 50 activities, sorted by timestamp
-    const activities = (data.activities || [])
-      .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    const sortedActivities = [...activities]
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       .slice(0, 50);
     
     return NextResponse.json({
       success: true,
-      activities,
+      activities: sortedActivities,
     });
   } catch (error) {
     console.error('Error reading activities:', error);
@@ -39,30 +38,38 @@ export async function GET() {
   }
 }
 
-// Helper function to log activities (can be called from other endpoints)
-export async function logActivity(activity: {
-  type: 'deploy' | 'task-complete' | 'agent-spawn' | 'error' | 'info';
-  message: string;
-  details?: string;
-}) {
-  await initActivitiesFile();
-  
-  const fileContents = await fs.readFile(ACTIVITIES_FILE, 'utf-8');
-  const data = JSON.parse(fileContents);
-  
-  const newActivity = {
-    id: `act-${Date.now()}`,
-    ...activity,
-    timestamp: new Date().toISOString(),
-  };
-  
-  data.activities.push(newActivity);
-  
-  // Keep only last 200 activities
-  if (data.activities.length > 200) {
-    data.activities = data.activities.slice(-200);
+export async function POST(request: Request) {
+  try {
+    const { type, message, details } = await request.json();
+    
+    if (!type || !message) {
+      return NextResponse.json({ error: 'Type and message required' }, { status: 400 });
+    }
+    
+    const newActivity = {
+      id: `act-${Date.now()}`,
+      type,
+      message,
+      details,
+      timestamp: new Date().toISOString(),
+    };
+    
+    activities.push(newActivity);
+    
+    // Keep only last 200 activities
+    if (activities.length > 200) {
+      activities.splice(0, activities.length - 200);
+    }
+    
+    return NextResponse.json({
+      success: true,
+      activity: newActivity,
+    });
+  } catch (error) {
+    console.error('Error logging activity:', error);
+    return NextResponse.json(
+      { error: 'Failed to log activity' },
+      { status: 500 }
+    );
   }
-  
-  await fs.writeFile(ACTIVITIES_FILE, JSON.stringify(data, null, 2));
-  return newActivity;
 }
