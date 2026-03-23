@@ -182,6 +182,17 @@ export const mockSubagents: Subagent[] = [
     techStack: ['Whisper API', 'YouTube Transcript API', 'TikTok Scraper'],
     features: ['Auto transcript extraction', 'One-click copy', 'Multi-platform support', 'Language detection'],
   },
+  {
+    id: 'sa-8',
+    name: 'eventbrite-rsvp',
+    task: 'Auto-RSVP to free & early-bird events',
+    status: 'idle',
+    progress: 0,
+    eta: 'on-demand',
+    projectType: 'app',
+    techStack: ['Eventbrite API', 'Node.js', 'Auto-registration'],
+    features: ['Free ticket detection', 'Early-bird grabber (≤$15)', 'Auto-RSVP', 'Order tracking'],
+  },
 ];
 
 // Mock Activity Feed

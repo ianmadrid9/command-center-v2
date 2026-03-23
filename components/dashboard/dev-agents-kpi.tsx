@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Subagent } from '@/lib/mockData';
 import { SubagentChat } from './subagent-chat';
 
@@ -10,12 +10,45 @@ interface DevAgentsKpiProps {
 
 export function DevAgentsKpi({ subagents }: DevAgentsKpiProps) {
   const [showChat, setShowChat] = useState(false);
-  
+  const [isRunningRSVP, setIsRunningRSVP] = useState(false);
+  const [rsvpCount, setRsvpCount] = useState<number | null>(null);
+
+  // Load RSVP count on mount
+  useEffect(() => {
+    fetch('/api/rsvps')
+      .then(res => res.json())
+      .then(data => setRsvpCount(data.total_count || 0))
+      .catch(() => setRsvpCount(0));
+  }, []);
+
   const total = subagents.length;
   const idle = subagents.filter(s => s.status === 'idle').length;
   const running = subagents.filter(s => s.status === 'running').length;
   const completed = subagents.filter(s => s.status === 'completed').length;
   const urgentCount = subagents.filter(s => s.status === 'running' && s.progress < 50).length;
+
+  // Trigger RSVP agent
+  async function triggerRSVP() {
+    setIsRunningRSVP(true);
+    try {
+      const response = await fetch('/api/agents/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agent: 'eventbrite-rsvp' })
+      });
+      const result = await response.json();
+      if (result.success) {
+        setRsvpCount(result.rsvps?.length || rsvpCount! + 1);
+        alert(`✅ RSVP agent completed! Grabbed ${result.rsvps?.length || 0} tickets.`);
+      } else {
+        alert(`⚠️ ${result.error || 'RSVP agent failed'}`);
+      }
+    } catch (error) {
+      alert('❌ Failed to run RSVP agent');
+    } finally {
+      setIsRunningRSVP(false);
+    }
+  }
 
   return (
     <>
@@ -41,6 +74,30 @@ export function DevAgentsKpi({ subagents }: DevAgentsKpiProps) {
             )}
             <p className="text-xs text-accent mt-1">Click to chat with agents ↗</p>
           </div>
+        </div>
+        
+        {/* Quick RSVP Action */}
+        <div className="flex items-center justify-between mb-4 p-3 rounded-xl bg-slate-900/50 border border-border/50">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🎫</span>
+            <div>
+              <p className="text-sm font-medium">Eventbrite RSVP Agent</p>
+              <p className="text-xs text-muted">
+                {rsvpCount !== null ? `✅ ${rsvpCount} tickets grabbed` : 'Auto-grab free & early-bird tickets'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); triggerRSVP(); }}
+            disabled={isRunningRSVP}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              isRunningRSVP
+                ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                : 'bg-accent/20 text-accent hover:bg-accent/30'
+            }`}
+          >
+            {isRunningRSVP ? '🔄 Running...' : '🚀 Run Now'}
+          </button>
         </div>
         
         {/* Quick Agent Status */}
