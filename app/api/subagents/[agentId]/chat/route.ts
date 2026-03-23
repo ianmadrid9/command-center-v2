@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// In-memory conversation storage (Vercel-compatible)
-// Note: Conversations reset on serverless cold start
-// For permanent storage, use a database
+// In-memory conversation storage
 const conversations = new Map<string, Array<{
   id: string;
   type: 'user' | 'agent' | 'assistant';
@@ -11,41 +9,16 @@ const conversations = new Map<string, Array<{
   timestamp: string;
 }>>();
 
-// Agent personalities and response patterns
-const agentPersonalities: Record<string, {
-  greeting: string;
-  responses: string[];
-  signature: string;
-}> = {
+// Agent personalities
+const agentPersonalities: Record<string, { greeting: string }> = {
   'eventbrite-scout': {
     greeting: "Hey! I'm eventbrite-scout, your event research specialist. I scan Eventbrite daily for tech meetups, networking events, and early-bird tickets in NYC. What do you need?",
-    responses: [
-      "Got it! I'll add that to my next Eventbrite scan. I check for free tickets, early-bird deals, and tech/networking events near 50th & 2nd Ave.",
-      "Noted! I'll prioritize that in my search criteria. I'm looking for events with strong networking potential and good value.",
-      "Perfect! I'll keep an eye out for that. My next scan will include those keywords and filters.",
-      "Thanks for the update! I'll adjust my search parameters accordingly.",
-    ],
-    signature: "🎫 Event Scout",
   },
   'eventbrite-rsvp': {
     greeting: "Hi! I'm eventbrite-rsvp, your auto-registration agent. I grab free and early-bird tickets before they sell out. I can auto-RSVP to events matching your criteria. What's the plan?",
-    responses: [
-      "Understood! I'll auto-RSVP to events matching those criteria. I move fast on early-bird tickets!",
-      "Got it! I'll prioritize those events. My sweet spot is free tickets and early-bird under $15.",
-      "Perfect! I'll watch for those and register immediately when they drop.",
-      "Acknowledged! I'll add that to my RSVP filters and act quickly.",
-    ],
-    signature: "🎫 RSVP Bot",
   },
   'transcript-bot': {
     greeting: "Hello! I'm transcript-bot, your content extraction specialist. I pull transcripts from TikTok, YouTube, and other platforms. Need something transcribed?",
-    responses: [
-      "Got it! Send me the URL and I'll extract the full transcript with timestamps.",
-      "Understood! I can handle TikTok, YouTube, and most video platforms. Just share the link.",
-      "Perfect! I'll extract the transcript and clean it up for easy reading.",
-      "Thanks! I'll process that and have the transcript ready in seconds.",
-    ],
-    signature: "📝 Transcript Bot",
   },
 };
 
@@ -64,13 +37,6 @@ export async function POST(
     // Get agent personality
     const personality = agentPersonalities[agentId] || {
       greeting: "Hey! I'm ready to help.",
-      responses: [
-        "Got it! I'll work on that for you.",
-        "Understood! Processing your request now.",
-        "Thanks for the update! I'm on it.",
-        "Acknowledged! Let me handle this for you.",
-      ],
-      signature: "Agent",
     };
     
     // Initialize conversation if needed
@@ -80,7 +46,7 @@ export async function POST(
           id: 'init-1',
           type: 'assistant',
           sender: 'Rook (Assistant)',
-          text: `I'm here with ${agentId}. Ready for: ${personality.greeting.split('.')[1] || 'tasks'}`,
+          text: `I'm here with ${agentId}. ${personality.greeting}`,
           timestamp: new Date().toISOString(),
         },
         {
@@ -105,23 +71,24 @@ export async function POST(
     };
     agentConversation.push(userMessage);
     
-    // Generate contextual response based on message
+    // Get intelligent AI response
     let responseText: string;
-    const lowerMessage = message.toLowerCase();
-    
-    // Contextual responses
-    if (lowerMessage.includes('hi') || lowerMessage.includes('hello') || lowerMessage.includes('hey')) {
-      responseText = `Hey there! 👋 ${personality.responses[Math.floor(Math.random() * personality.responses.length)]}`;
-    } else if (lowerMessage.includes('status') || lowerMessage.includes('progress') || lowerMessage.includes('update')) {
-      responseText = "I'm currently idle and ready for tasks. Check the dashboard for my latest activity!";
-    } else if (lowerMessage.includes('thank')) {
-      responseText = "You're welcome! Always happy to help. What's next?";
-    } else if (lowerMessage.includes('what can you do') || lowerMessage.includes('help me')) {
-      responseText = personality.greeting;
-    } else {
-      // Pick response based on message length (simulate thought)
-      const responses = personality.responses;
-      responseText = responses[Math.floor(Math.random() * responses.length)];
+    try {
+      // Try to call the AI endpoint
+      const aiResponse = await fetch(new URL('/api/ai/chat', request.url).toString(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message,
+          agentId,
+          conversation: agentConversation.slice(-10),
+        }),
+      }).then(res => res.json());
+      
+      responseText = aiResponse.response || generateFallbackResponse(message, agentId);
+    } catch (error) {
+      console.error('AI call failed, using fallback:', error);
+      responseText = generateFallbackResponse(message, agentId);
     }
     
     const agentMessage = {
@@ -136,14 +103,14 @@ export async function POST(
     // Save conversation
     conversations.set(agentId, agentConversation);
     
-    // Rook chimes in occasionally (every 3rd message)
+    // Rook chimes in occasionally
     if (agentConversation.filter(m => m.type === 'user').length % 3 === 0) {
       setTimeout(() => {
         const rookMessage = {
           id: `msg-${Date.now() + 2}`,
           type: 'assistant' as const,
           sender: 'Rook (Assistant)',
-          text: `I'm tracking this conversation. Let me know if you need anything else!`,
+          text: `I'm tracking this. Let me know if you need anything else!`,
           timestamp: new Date().toISOString(),
         };
         agentConversation.push(rookMessage);
@@ -159,7 +126,7 @@ export async function POST(
   } catch (error) {
     console.error('Error in agent chat:', error);
     return NextResponse.json(
-      { error: 'Failed to process message', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to process message' },
       { status: 500 }
     );
   }
@@ -171,7 +138,6 @@ export async function GET(
 ) {
   try {
     const { agentId } = await params;
-    
     const conversation = conversations.get(agentId) || [];
     
     return NextResponse.json({
@@ -185,4 +151,23 @@ export async function GET(
       { status: 500 }
     );
   }
+}
+
+// Fallback responses when AI is not available
+function generateFallbackResponse(message: string, agentId: string): string {
+  const lower = message.toLowerCase();
+  
+  if (lower.includes('hi') || lower.includes('hello') || lower.includes('hey')) {
+    return "Hey there! 👋 What can I help you with?";
+  }
+  if (lower.includes('status') || lower.includes('progress')) {
+    return "I'm idle and ready for tasks!";
+  }
+  if (lower.includes('thank')) {
+    return "You're welcome! What's next?";
+  }
+  if (lower.includes('what can you do')) {
+    return agentPersonalities[agentId]?.greeting || "I'm here to help with my specialized tasks!";
+  }
+  return `Got it! I'm on it. Let me process this and get back to you.`;
 }
