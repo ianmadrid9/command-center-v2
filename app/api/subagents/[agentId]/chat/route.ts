@@ -273,6 +273,37 @@ Let me find the best options for you this week. I'll prioritize events that help
     return "Doing great! Ready to tackle some tasks. I know you've got SPM running with 3,000+ employees, OkPo AI growing, and Batch 8 interns starting. What do you need help with?";
   }
   
+  // Intelligence/capability questions
+  if (lower.includes('smart') || lower.includes('intelligent') || lower.includes('aware') || lower.includes('conscious')) {
+    return `Yes! I have full context about you, Ian:
+• Your companies: SPM (3,000+ employees) and OkPo AI
+• Your goals: Attend 3-5 networking events/month in NYC
+• Your preferences: Free events or ≤$15, near 50th & 2nd Ave
+• Your content: TikTok @ianmadrid_ with 74.5K followers
+• Your projects: Command Center, Tech Internship Batch 8
+
+I'm not just templated responses - I know YOUR specific situation and can help accordingly. What do you need?`;
+  }
+  
+  // Test questions
+  if (lower.includes('test') || lower.includes('prove') || lower.includes('show me')) {
+    return "Ask me anything about your events, preferences, or goals! I know you want free/≤$15 tech meetups near 50th & 2nd, you're running SPM with 3,000+ team in Philippines, and you create TikTok content. What do you want to know?";
+  }
+  
+  // Who questions
+  if (lower.includes('who are you') || lower.includes('what are you')) {
+    return `I'm ${agentId}, your specialized AI agent. I have full memory of Ian's context:
+• CEO of SPM (3,000+ employees)
+• Founder of OkPo AI
+• Based in NYC (50th & 2nd)
+• Goal: 3-5 networking events/month
+• Prefers free/≤$15 events
+
+I'm here to help with my specialty. What do you need?`;
+  }
+  
   // Default contextual response - shows memory awareness
-  return `Got it, Ian! I'm on this. I know you value quick, actionable info, so I'll make this count. Give me a moment to process and I'll get back to you with results that match your preferences and goals.`;
+  return `Got it, Ian! I'm on this. I know you value quick, actionable info, so I'll make this count. Give me a moment to process and I'll get back to you with results that match your preferences and goals.
+
+(FYI - I have full context about you: SPM, OkPo AI, 3-5 events/month goal, free/≤$15 preference, 50th & 2nd location. Ask me anything specific!)`;
 }
