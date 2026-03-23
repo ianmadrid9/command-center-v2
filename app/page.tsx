@@ -11,7 +11,7 @@ import { QuickActions } from '@/components/dashboard/quick-actions';
 import { SystemCapacity } from '@/components/dashboard/system-capacity';
 import { EventbriteMonitor } from '@/components/dashboard/eventbrite-monitor';
 import { TranscriptExtractor } from '@/components/dashboard/transcript-extractor';
-import { fetchTikTokStats, fetchLinkedInStats, fetchTikTokComments, fetchLinkedInComments, mockHealth, mockQuickActions, mockEventbriteEvents, mockTranscripts, getTaskStats, getSubagentStats } from '@/lib/mockData';
+import { getTikTokStats, getLinkedInStats, getRecentComments, getRecentLinkedInComments, mockHealth, mockQuickActions, mockEventbriteEvents, mockTranscripts, getTaskStats, getSubagentStats } from '@/lib/mockData';
 
 export default function Dashboard() {
   const [useMockData, setUseMockData] = useState(true);
@@ -22,8 +22,8 @@ export default function Dashboard() {
   const subagentStats = getSubagentStats();
   const tiktokStats = getTikTokStats();
   const linkedInStats = getLinkedInStats();
-  const recentComments = fetchTikTokComments().slice(0, 8);
-  const recentLinkedInComments = fetchLinkedInComments().slice(0, 6);
+  const recentComments = getRecentComments(8);
+  const recentLinkedInComments = getRecentLinkedInComments(6);
   const recentTranscripts = mockTranscripts.slice(0, 5);
 
   function handleQuickAction(action: string) {
