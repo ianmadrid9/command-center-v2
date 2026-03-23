@@ -88,10 +88,10 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { agentId: string } }
+  { params }: { params: Promise<{ agentId: string }> }
 ) {
   try {
-    const agentId = params.agentId;
+    const { agentId } = await params;
     
     const fileContents = await fs.readFile(STATE_FILE, 'utf-8');
     const data = JSON.parse(fileContents);
@@ -107,6 +107,10 @@ export async function GET(
     return NextResponse.json(
       { error: 'Failed to read conversation' },
       { status: 500 }
+    );
+  }
+}
+     { status: 500 }
     );
   }
 }
