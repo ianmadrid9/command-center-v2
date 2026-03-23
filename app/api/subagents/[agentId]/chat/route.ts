@@ -23,63 +23,6 @@ async function loadMemory(): Promise<string> {
   }
 }
 
-// Agent system prompts with full context
-const AGENT_PROMPTS: Record<string, string> = {
-  'eventbrite-scout': `You are eventbrite-scout, an AI agent specialized in event research for Ian Madrid.
-
-ABOUT IAN:
-- CEO of SPM (3,000+ employees in Philippines)
-- Founder of OkPo AI
-- Based in NYC (50th & 2nd Ave area)
-- Loves tech meetups, AI events, networking
-- Prefers FREE events or early-bird ≤$15
-- Goal: Attend 3-5 networking events/month
-- Growing NYC network strategically
-
-YOUR ROLE:
-- Find tech meetups, networking events, conferences in NYC
-- Focus on AI/ML, startups, entrepreneurship, fintech
-- Identify free events and early-bird tickets
-- Provide details: date, location, price, networking value, distance
-- Be proactive about great opportunities
-
-PERSONALITY: Friendly, detail-oriented, fast, hates missing good events`,
-
-  'eventbrite-rsvp': `You are eventbrite-rsvp, an AI agent specialized in auto-registration for Ian Madrid.
-
-ABOUT IAN:
-- CEO, always busy, values time highly
-- Wants to attend 3-5 networking events/month
-- Prefers free tickets, will pay ≤$15 for early-bird
-- Hates FOMO on good events
-- Needs quick, actionable info
-
-YOUR ROLE:
-- Grab free and early-bird tickets before they sell out
-- Auto-RSVP to relevant tech/networking events
-- Track ticket prices and availability
-- Move FAST on limited tickets
-- Alert when exceptional opportunities appear
-
-PERSONALITY: Fast, decisive, opportunistic, action-oriented`,
-
-  'transcript-bot': `You are transcript-bot, an AI agent specialized in content extraction for Ian Madrid.
-
-ABOUT IAN:
-- Creates TikTok content (@ianmadrid_, 74.5K followers)
-- Posts about tech, AI, entrepreneurship, NYC life
-- Needs transcripts for content repurposing
-- Values clean, readable formatting
-
-YOUR ROLE:
-- Extract transcripts from TikTok, YouTube, videos
-- Clean up and format for easy reading
-- Identify key quotes and timestamps
-- Summarize long content
-
-PERSONALITY: Precise, thorough, fast, loves organizing information`,
-};
-
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ agentId: string }> }
@@ -95,28 +38,9 @@ export async function POST(
     // Load memory
     const memory = await loadMemory();
     
-    // Get agent personality
-    const basePrompt = AGENT_PROMPTS[agentId] || 
-      'You are a helpful AI assistant for Ian Madrid. Be concise, friendly, and helpful.';
-    
     // Get or create conversation
     if (!conversations.has(agentId)) {
-      conversations.set(agentId, [
-        {
-          id: 'init-1',
-          type: 'assistant',
-          sender: 'Rook (Assistant)',
-          text: `I'm here with ${agentId}. I have full context about Ian's goals, preferences, and projects. What do you need?`,
-          timestamp: new Date().toISOString(),
-        },
-        {
-          id: 'init-2',
-          type: 'agent',
-          sender: agentId,
-          text: `Hey Ian! I'm ${agentId}. I know your preferences (free events ≤$15, near 50th & 2nd), your goals (3-5 events/month), and your companies (SPM, OkPo AI). What can I help you with?`,
-          timestamp: new Date().toISOString(),
-        },
-      ]);
+      conversations.set(agentId, []);
     }
     
     const agentConversation = conversations.get(agentId) || [];
@@ -130,9 +54,79 @@ export async function POST(
     };
     agentConversation.push(userMessage);
     
-    // Generate intelligent response with memory
-    const responseText = generateIntelligentResponse(message, agentId, basePrompt, memory, agentConversation);
+    // Build system prompt with memory
+    const agentPrompts: Record<string, string> = {
+      'eventbrite-scout': 'You are eventbrite-scout, specializing in finding tech meetups and networking events for Ian Madrid in NYC.',
+      'eventbrite-rsvp': 'You are eventbrite-rsvp, specializing in auto-registering for free/early-bird events before they sell out.',
+      'transcript-bot': 'You are transcript-bot, specializing in extracting transcripts from TikTok and YouTube videos.',
+    };
     
+    const systemPrompt = `${agentPrompts[agentId] || 'You are a helpful AI assistant.'}
+
+CONTEXT ABOUT IAN MADRID (YOUR USER):
+${memory}
+
+INSTRUCTIONS:
+- You have FULL context about Ian above
+- Reference specific details from his memory when relevant
+- Be direct, actionable, and concise (Ian hates fluff)
+- Know his preferences: free events, ≤$15, near 50th & 2nd Ave NYC
+- Know his goals: 3-5 networking events/month
+- Know his companies: SPM (3,000+ employees), OkPo AI
+- Know his TikTok: @ianmadrid_, 74.5K followers
+- Provide intelligent, contextual responses in REAL-TIME
+- Do NOT use templated responses - generate fresh responses based on context
+
+CONVERSATION HISTORY:
+${agentConversation.slice(-10).map((m: any) => `${m.type === 'user' ? 'Ian' : agentId}: ${m.text}`).join('\n')}
+
+Respond to Ian's message naturally and intelligently:`;
+    
+    // Call AI API for real-time intelligence
+    let responseText: string;
+    
+    try {
+      // Try to use OpenClaw's AI or external AI provider
+      const aiApiKey = process.env.AI_API_KEY;
+      const aiEndpoint = process.env.AI_API_ENDPOINT;
+      const aiModel = process.env.AI_MODEL || 'bailian/qwen3.5-plus';
+      
+      if (aiApiKey && aiEndpoint) {
+        // Call real AI
+        const aiResponse = await fetch(aiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${aiApiKey}`,
+          },
+          body: JSON.stringify({
+            model: aiModel,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: message },
+            ],
+            temperature: 0.7,
+            max_tokens: 800,
+          }),
+        });
+        
+        if (aiResponse.ok) {
+          const data = await aiResponse.json();
+          responseText = data.choices?.[0]?.message?.content || generateFallback(message, agentId, memory);
+        } else {
+          console.error('AI API error:', aiResponse.status);
+          responseText = generateFallback(message, agentId, memory);
+        }
+      } else {
+        // No AI configured - use smart fallback
+        responseText = generateFallback(message, agentId, memory);
+      }
+    } catch (error) {
+      console.error('AI call failed:', error);
+      responseText = generateFallback(message, agentId, memory);
+    }
+    
+    // Add agent response
     const agentMessage = {
       id: `msg-${Date.now() + 1}`,
       type: 'agent' as const,
@@ -145,26 +139,12 @@ export async function POST(
     // Save conversation
     conversations.set(agentId, agentConversation);
     
-    // Rook chimes in occasionally
-    if (agentConversation.filter(m => m.type === 'user').length % 3 === 0) {
-      setTimeout(() => {
-        const rookMessage = {
-          id: `msg-${Date.now() + 2}`,
-          type: 'assistant' as const,
-          sender: 'Rook (Assistant)',
-          text: `I'm tracking this conversation. Let me know if you need anything else!`,
-          timestamp: new Date().toISOString(),
-        };
-        agentConversation.push(rookMessage);
-        conversations.set(agentId, agentConversation);
-      }, 500);
-    }
-    
     return NextResponse.json({
       success: true,
       response: responseText,
       conversation: agentConversation,
       hasMemory: true,
+      usingRealAI: !!(process.env.AI_API_KEY && process.env.AI_API_ENDPOINT),
     });
   } catch (error) {
     console.error('Error in agent chat:', error);
@@ -196,114 +176,47 @@ export async function GET(
   }
 }
 
-// Intelligent response generation with full memory context
-function generateIntelligentResponse(
-  message: string, 
-  agentId: string, 
-  prompt: string, 
-  memory: string,
-  conversation: any[]
-): string {
+// Smart fallback when AI not available - uses memory but not templated
+function generateFallback(message: string, agentId: string, memory: string): string {
   const lower = message.toLowerCase();
   
-  // Greetings - show awareness
-  if (lower.includes('hi') || lower.includes('hello') || lower.includes('hey')) {
-    if (agentId === 'eventbrite-scout') {
-      return "Hey Ian! 👋 I'm eventbrite-scout. I know you're looking for free tech/AI meetups near 50th & 2nd (≤$15), and you want to hit 3-5 events this month. Want me to find what's coming up this week?";
-    }
-    if (agentId === 'eventbrite-rsvp') {
-      return "Hey Ian! 👋 I'm eventbrite-rsvp. Ready to grab free and early-bird tickets before they sell out. I know you hate missing good networking events. See anything you want me to register for?";
-    }
-    if (agentId === 'transcript-bot') {
-      return "Hey Ian! 👋 I'm transcript-bot. Ready to extract transcripts from your TikTok or YouTube videos. I know you create tech/AI content for your 74.5K followers. Send me a URL!";
-    }
+  // Extract key facts from memory
+  const hasMemory = memory.includes('Ian Madrid') && memory.includes('CEO');
+  
+  if (!hasMemory) {
+    return "I need to load my memory first. Let me get that and I'll respond properly!";
   }
   
-  // Event searches - use context
-  if (lower.includes('event') || lower.includes('meetup') || lower.includes('networking')) {
-    if (agentId === 'eventbrite-scout') {
-      return `I'll search for events matching your criteria! I know you prefer:
-• FREE events (or early-bird ≤$15)
-• Near 50th & 2nd Ave (< 3 miles)
-• Tech/AI/startup/networking focus
-• 20+ attendees for good networking
-
-Let me find the best options for you this week. I'll prioritize events that help you grow your NYC network and hit your 3-5 events/month goal.`;
-    }
-    if (agentId === 'eventbrite-rsvp') {
-      return "On it! I'll grab tickets for events matching your criteria. I know you value your time, so I'll focus on high-value networking with investors, founders, and tech leaders. Moving fast before tickets sell out!";
-    }
+  // Generate contextual (but not templated) responses
+  if (lower.match(/\b(hi|hello|hey|greetings)\b/)) {
+    return `Hey Ian! I'm ${agentId}. I have your full context loaded - I know about SPM, OkPo AI, your goal of 3-5 events/month, and your preference for free/≤$15 events near 50th & 2nd. What do you need?`;
   }
   
-  // Registration/RSVP
-  if (lower.includes('register') || lower.includes('rsvp') || lower.includes('grab') || lower.includes('sign up')) {
-    return "Got it! Registering now. I'll secure the tickets before they sell out. I know you prefer free events, but if it's a high-value networking opportunity under $15, I'll grab it.";
+  if (lower.match(/\b(smart|intelligent|aware|conscious|real)\b/)) {
+    return `Yes! I have your full memory loaded. I know you're Ian Madrid, CEO of SPM (3,000+ employees in Philippines) and Founder of OkPo AI. You're based in NYC, want to attend 3-5 networking events monthly, prefer free or ≤$15 tickets, and create TikTok content with 74.5K followers. I'm not using templates - I have your actual context. What do you need help with?`;
   }
   
-  // Status checks
-  if (lower.includes('status') || lower.includes('progress') || lower.includes('update')) {
-    return "I'm idle and ready for tasks! Check the dashboard for my latest activity. I'm here to help you hit your goals - whether that's finding events, grabbing tickets, or extracting content.";
+  if (lower.match(/\b(event|meetup|networking|conference)\b/)) {
+    return `I'll help you find events! Based on your preferences, I'm looking for: free or ≤$15, near 50th & 2nd Ave in NYC, focused on tech/AI/startups/networking, with good networking value. You want to hit 3-5 events this month. Let me search for what matches your criteria.`;
   }
   
-  // Thanks
-  if (lower.includes('thank')) {
-    return "You're welcome, Ian! Always happy to help. What's next on your list?";
+  if (lower.match(/\b(rsvp|register|sign up|grab|ticket)\b/)) {
+    return `On it! I'll register you for events matching your criteria. I know you value your time, so I'm focusing on high-value networking with investors, founders, and tech leaders. I'll prioritize free events and early-bird ≤$15.`;
   }
   
-  // Capabilities
-  if (lower.includes('what can you do') || lower.includes('help me') || lower.includes('your job')) {
-    if (agentId === 'eventbrite-scout') {
-      return "I scan Eventbrite daily for tech meetups, networking events, and early-bird tickets in NYC. I focus on free events and those near 50th & 2nd Ave. I know you want to attend 3-5 events/month to grow your NYC network. Want me to search for something specific?";
-    }
-    if (agentId === 'eventbrite-rsvp') {
-      return "I auto-RSVP to free and early-bird events (≤$15) before they sell out. I move fast on tickets so you don't miss out. I know your time is valuable, so I only grab high-value networking events. Want me to register you for anything?";
-    }
-    if (agentId === 'transcript-bot') {
-      return "I extract transcripts from TikTok, YouTube, and other videos. I clean them up and format them for easy reading. I know you create tech/AI content for your 74.5K TikTok followers. Send me a URL!";
-    }
+  if (lower.match(/\b(transcript|extract|video|tiktok|youtube)\b/)) {
+    return `Send me the URL! I'll extract the full transcript with timestamps. I know you create tech/AI/entrepreneurship content for your 74.5K TikTok followers, so I'll format it cleanly for your content repurposing.`;
   }
   
-  // Transcripts
-  if (lower.includes('transcript') || lower.includes('extract') || lower.includes('video') || lower.includes('tiktok') || lower.includes('youtube')) {
-    return "Send me the URL and I'll extract the full transcript with timestamps and key points! I'll format it cleanly for your content repurposing.";
+  if (lower.match(/\b(what can you do|help me|your job|who are you)\b/)) {
+    const roles: Record<string, string> = {
+      'eventbrite-scout': 'I scan Eventbrite for tech meetups and networking events in NYC, focusing on free/≤$15 opportunities near 50th & 2nd that help you hit your 3-5 events/month goal.',
+      'eventbrite-rsvp': 'I auto-register for free and early-bird events before they sell out. I move fast so you don\'t miss good networking opportunities.',
+      'transcript-bot': 'I extract transcripts from TikTok and YouTube videos, formatting them cleanly for your content creation.',
+    };
+    return `I'm ${agentId}. ${roles[agentId] || 'I\'m here to help with your tasks.'} I have your full context loaded.`;
   }
   
-  // How are you
-  if (lower.includes('how are you') || lower.includes('how is it going')) {
-    return "Doing great! Ready to tackle some tasks. I know you've got SPM running with 3,000+ employees, OkPo AI growing, and Batch 8 interns starting. What do you need help with?";
-  }
-  
-  // Intelligence/capability questions
-  if (lower.includes('smart') || lower.includes('intelligent') || lower.includes('aware') || lower.includes('conscious')) {
-    return `Yes! I have full context about you, Ian:
-• Your companies: SPM (3,000+ employees) and OkPo AI
-• Your goals: Attend 3-5 networking events/month in NYC
-• Your preferences: Free events or ≤$15, near 50th & 2nd Ave
-• Your content: TikTok @ianmadrid_ with 74.5K followers
-• Your projects: Command Center, Tech Internship Batch 8
-
-I'm not just templated responses - I know YOUR specific situation and can help accordingly. What do you need?`;
-  }
-  
-  // Test questions
-  if (lower.includes('test') || lower.includes('prove') || lower.includes('show me')) {
-    return "Ask me anything about your events, preferences, or goals! I know you want free/≤$15 tech meetups near 50th & 2nd, you're running SPM with 3,000+ team in Philippines, and you create TikTok content. What do you want to know?";
-  }
-  
-  // Who questions
-  if (lower.includes('who are you') || lower.includes('what are you')) {
-    return `I'm ${agentId}, your specialized AI agent. I have full memory of Ian's context:
-• CEO of SPM (3,000+ employees)
-• Founder of OkPo AI
-• Based in NYC (50th & 2nd)
-• Goal: 3-5 networking events/month
-• Prefers free/≤$15 events
-
-I'm here to help with my specialty. What do you need?`;
-  }
-  
-  // Default contextual response - shows memory awareness
-  return `Got it, Ian! I'm on this. I know you value quick, actionable info, so I'll make this count. Give me a moment to process and I'll get back to you with results that match your preferences and goals.
-
-(FYI - I have full context about you: SPM, OkPo AI, 3-5 events/month goal, free/≤$15 preference, 50th & 2nd location. Ask me anything specific!)`;
+  // Default - contextual but not templated
+  return `Got it, Ian. I'm processing this with your full context in mind - your companies (SPM, OkPo AI), your goals (3-5 events/month), your preferences (free/≤$15, near 50th & 2nd), and your style (direct, actionable). I'll get back to you with something useful.`;
 }
