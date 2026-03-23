@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { EventbriteAgent } from './eventbrite-agent';
 
 interface Agent {
   agentId: string;
@@ -13,6 +14,7 @@ interface Agent {
 export function DevAgentsKpi() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadAgents() {
@@ -111,6 +113,16 @@ export function DevAgentsKpi() {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+  </div>
+        ))}
+      </div>
+
+      {selectedAgent === 'eventbrite' && (
+        <EventbriteAgent onClose={() => setSelectedAgent(null)} />
+      )}
     </div>
   );
 }
