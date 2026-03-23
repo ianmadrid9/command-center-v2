@@ -4,7 +4,7 @@
  */
 
 // Types (re-export from mockData for consistency)
-export {
+export type {
   Task,
   Subagent,
   Activity,
