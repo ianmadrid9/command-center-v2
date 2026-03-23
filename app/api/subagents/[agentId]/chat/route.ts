@@ -6,11 +6,11 @@ const STATE_FILE = path.join(process.cwd(), 'data', 'subagents.json');
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { agentId: string } }
+  { params }: { params: Promise<{ agentId: string }> }
 ) {
   try {
     const { message } = await request.json();
-    const agentId = params.agentId;
+    const { agentId } = await params;
     
     if (!message) {
       return NextResponse.json({ error: 'Message required' }, { status: 400 });
@@ -107,10 +107,6 @@ export async function GET(
     return NextResponse.json(
       { error: 'Failed to read conversation' },
       { status: 500 }
-    );
-  }
-}
-     { status: 500 }
     );
   }
 }
