@@ -1,0 +1,27 @@
+{
+  "agentId": "linkedin-monitor",
+  "name": "💼 LinkedIn Monitor",
+  "status": "healthy",
+  "lastRun": "2026-03-23T22:51:53.241Z",
+  "nextRun": "2026-03-24T00:51:53.241Z",
+  "instructions": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-23T23:51:53.241Z",
+      "type": "info",
+      "message": "Check for new comments every hour"
+    }
+  ],
+  "developments": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-23T22:51:53.241Z",
+      "type": "info",
+      "message": "3 new comments on recent post"
+    }
+  ],
+  "insights": [],
+  "brainstorming": [],
+  "ianLastVisit": null,
+  "rookLastSummary": null
+}

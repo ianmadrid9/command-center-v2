@@ -1,0 +1,27 @@
+{
+  "agentId": "transcript-extractor",
+  "name": "📝 Transcripts",
+  "status": "healthy",
+  "lastRun": "2026-03-23T20:51:53.241Z",
+  "nextRun": null,
+  "instructions": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-23T23:51:53.241Z",
+      "type": "info",
+      "message": "Extract transcripts when URL is provided"
+    }
+  ],
+  "developments": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-23T20:51:53.241Z",
+      "type": "info",
+      "message": "Extracted 2 transcripts today"
+    }
+  ],
+  "insights": [],
+  "brainstorming": [],
+  "ianLastVisit": null,
+  "rookLastSummary": null
+}

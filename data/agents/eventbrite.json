@@ -1,0 +1,40 @@
+{
+  "agentId": "eventbrite",
+  "name": "🎫 Eventbrite",
+  "status": "warning",
+  "lastRun": "2026-03-23T17:51:53.241Z",
+  "nextRun": "2026-03-23T23:51:53.241Z",
+  "instructions": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-23T23:51:53.241Z",
+      "type": "info",
+      "message": "Find tech meetups in NYC every 6 hours"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-23T23:51:53.241Z",
+      "type": "info",
+      "message": "Focus on free events or early-bird ≤$15"
+    }
+  ],
+  "developments": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-23T17:51:53.241Z",
+      "type": "info",
+      "message": "Found 5 events this week"
+    }
+  ],
+  "insights": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-23T23:51:53.241Z",
+      "type": "alert",
+      "message": "2 events have free tickets selling fast - grab soon"
+    }
+  ],
+  "brainstorming": [],
+  "ianLastVisit": null,
+  "rookLastSummary": null
+}
