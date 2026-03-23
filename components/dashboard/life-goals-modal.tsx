@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Subagent } from '@/lib/mockData';
+import { mockLifeGoals, mockLifeGoalSubagents, getGoalById, getSubagentByGoal } from '@/lib/mockData';
 
-interface SubagentChatProps {
-  subagents: Subagent[];
+interface LifeGoalsModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
@@ -17,39 +16,38 @@ interface Message {
   timestamp: string;
 }
 
-export function SubagentChat({ subagents, isOpen, onClose }: SubagentChatProps) {
-  const [selectedAgentId, setSelectedAgentId] = useState<string>(
-    subagents.find(s => s.status === 'running')?.id || subagents[0]?.id || ''
-  );
+export function LifeGoalsModal({ isOpen, onClose }: LifeGoalsModalProps) {
+  const [selectedGoalId, setSelectedGoalId] = useState<string>(mockLifeGoals[0]?.id || '');
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isAgentTyping, setIsAgentTyping] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const selectedAgent = subagents.find(a => a.id === selectedAgentId) || null;
+  const selectedGoal = getGoalById(selectedGoalId);
+  const subagent = selectedGoal ? getSubagentByGoal(selectedGoalId) : null;
 
-  // Initialize messages when agent changes
+  // Initialize messages when goal changes
   useEffect(() => {
-    if (selectedAgent) {
+    if (selectedGoal && subagent) {
       setMessages([
         {
           id: '1',
           type: 'assistant',
           sender: 'Rook (Assistant)',
-          text: `I'm here with ${selectedAgent.name}. ${selectedAgent.status === 'running' ? 'Currently working on:' : 'Ready for:'} ${selectedAgent.task}`,
+          text: `I'm here to help you achieve "${selectedGoal.name}". Your subagent ${subagent.name} is also here!`,
           timestamp: new Date().toISOString(),
         },
         {
           id: '2',
           type: 'agent',
-          sender: selectedAgent.name,
-          text: `Hey! I'm ${selectedAgent.name}. What do you need help with?`,
+          sender: subagent.name,
+          text: `Hey! I'm tracking your ${selectedGoal.name} goal. Next milestone: ${selectedGoal.nextMilestone} (${selectedGoal.nextMilestoneDate}). What do you need?`,
           timestamp: new Date().toISOString(),
         },
       ]);
     }
-  }, [selectedAgent]);
+  }, [selectedGoal, subagent]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -84,7 +82,7 @@ export function SubagentChat({ subagents, isOpen, onClose }: SubagentChatProps) 
 
   function handleSend(e?: React.FormEvent) {
     e?.preventDefault();
-    if (!input.trim() || !selectedAgent) return;
+    if (!input.trim() || !selectedGoal) return;
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -102,8 +100,8 @@ export function SubagentChat({ subagents, isOpen, onClose }: SubagentChatProps) 
       const agentMsg: Message = {
         id: (Date.now() + 1).toString(),
         type: 'agent',
-        sender: selectedAgent.name,
-        text: `Got it! I'll work on "${input}". Give me a few minutes and I'll update you.`,
+        sender: subagent?.name || 'advisor',
+        text: `Got it! I'll help you with "${input}". Let me update your plan and get back to you.`,
         timestamp: new Date().toISOString(),
       };
       setMessages(prev => [...prev, agentMsg]);
@@ -115,7 +113,7 @@ export function SubagentChat({ subagents, isOpen, onClose }: SubagentChatProps) 
           id: (Date.now() + 2).toString(),
           type: 'assistant',
           sender: 'Rook (Assistant)',
-          text: `I'm tracking this. Let me know if you need anything else!`,
+          text: `I'm tracking this task. Let me know if you need anything else for your ${selectedGoal.name} goal!`,
           timestamp: new Date().toISOString(),
         };
         setMessages(prev => [...prev, assistantMsg]);
@@ -130,12 +128,12 @@ export function SubagentChat({ subagents, isOpen, onClose }: SubagentChatProps) 
 
   function getStatusColor(status: string) {
     const colors: Record<string, string> = {
-      'running': 'text-green-400 bg-green-500/10 border-green-500/30',
+      'on-track': 'text-green-400 bg-green-500/10 border-green-500/30',
+      'needs-attention': 'text-amber-400 bg-amber-500/10 border-amber-500/30',
+      'at-risk': 'text-red-400 bg-red-500/10 border-red-500/30',
       'completed': 'text-blue-400 bg-blue-500/10 border-blue-500/30',
-      'failed': 'text-red-400 bg-red-500/10 border-red-500/30',
-      'idle': 'text-gray-400 bg-gray-500/10 border-gray-500/30',
     };
-    return colors[status] || colors['idle'];
+    return colors[status] || colors['on-track'];
   }
 
   if (!isOpen) return null;
@@ -144,10 +142,10 @@ export function SubagentChat({ subagents, isOpen, onClose }: SubagentChatProps) 
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
       <div 
         ref={modalRef}
-        className="card w-full max-w-4xl max-h-[80vh] flex flex-col overflow-hidden"
+        className="card w-full max-w-4xl max-h-[80vh] flex flex-col"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-8 py-6 border-b border-border flex-shrink-0">
+        <div className="flex items-center justify-between px-8 py-6 border-b border-border">
           <div className="flex items-center gap-4">
             <button
               onClick={onClose}
@@ -156,9 +154,9 @@ export function SubagentChat({ subagents, isOpen, onClose }: SubagentChatProps) 
               ← Back
             </button>
             <div>
-              <h3 className="text-lg font-semibold">Dev Agents</h3>
+              <h3 className="text-lg font-semibold">Life Goals</h3>
               <p className="text-xs text-muted">
-                {subagents.filter(s => s.status === 'running').length} running • {subagents.filter(s => s.status === 'idle').length} idle
+                {mockLifeGoals.filter(g => g.status === 'on-track').length} on track • {mockLifeGoals.filter(g => g.status === 'needs-attention').length} need attention
               </p>
             </div>
           </div>
@@ -170,110 +168,104 @@ export function SubagentChat({ subagents, isOpen, onClose }: SubagentChatProps) 
           </button>
         </div>
 
-        {/* Agent Tabs */}
-        <div className="flex gap-2 p-3 border-b border-border overflow-x-auto flex-shrink-0">
-          {subagents.map((agent) => (
+        {/* Goal Tabs */}
+        <div className="flex gap-2 p-3 border-b border-border overflow-x-auto">
+          {mockLifeGoals.map((goal) => (
             <button
-              key={agent.id}
-              onClick={() => setSelectedAgentId(agent.id)}
+              key={goal.id}
+              onClick={() => setSelectedGoalId(goal.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                selectedAgentId === agent.id
+                selectedGoalId === goal.id
                   ? 'bg-accent text-slate-950'
                   : 'bg-slate-800 text-muted hover:text-foreground'
               }`}
             >
-              {agent.status === 'running' ? '🟢' : '⏸️'} {agent.name}
+              {goal.icon} {goal.name}
             </button>
           ))}
         </div>
 
-        {/* Agent Details & Chat */}
-        <div className="flex-1 flex overflow-hidden min-h-0">
-          {/* Left: Agent Info */}
+        {/* Goal Details & Chat */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Left: Goal Info */}
           <div className="w-1/3 border-r border-border p-4 overflow-y-auto">
-            {selectedAgent && (
+            {selectedGoal && (
               <>
                 <div className="flex items-center gap-2 mb-4">
-                  <div className={`w-3 h-3 rounded-full ${
-                    selectedAgent.status === 'running' ? 'bg-green-500 animate-pulse' :
-                    selectedAgent.status === 'completed' ? 'bg-blue-500' :
-                    selectedAgent.status === 'failed' ? 'bg-red-500' :
-                    'bg-gray-500'
-                  }`} />
-                  <h4 className="font-semibold">{selectedAgent.name}</h4>
-                </div>
-
-                {/* Status Badge */}
-                <div className={`mb-4 p-2 rounded-lg border text-xs ${getStatusColor(selectedAgent.status)}`}>
-                  <p className="font-medium capitalize">{selectedAgent.status.replace('-', ' ')}</p>
-                </div>
-
-                {/* Current Task */}
-                <div className="mb-4">
-                  <p className="text-xs text-muted font-medium mb-1">Current Task</p>
-                  <p className="text-sm">{selectedAgent.task}</p>
+                  <span className="text-3xl">{selectedGoal.icon}</span>
+                  <div>
+                    <h4 className="font-semibold">{selectedGoal.name}</h4>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(selectedGoal.status)}`}>
+                      {selectedGoal.status.replace('-', ' ')}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Progress */}
-                {selectedAgent.status === 'running' && selectedAgent.progress < 100 && (
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-muted">Progress</span>
-                      <span className="text-accent">{selectedAgent.progress}%</span>
-                    </div>
-                    <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
+                <div className="mb-4">
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="text-muted">Progress</span>
+                    <span className="text-accent">{selectedGoal.progress}%</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
+                    <div
+                      className="h-2 rounded-full bg-accent"
+                      style={{ width: `${selectedGoal.progress}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Deadline */}
+                <div className="mb-4 p-3 rounded-lg bg-slate-900/50">
+                  <p className="text-xs text-muted mb-1">Deadline</p>
+                  <p className="text-sm font-medium">{new Date(selectedGoal.deadline).toLocaleDateString()}</p>
+                </div>
+
+                {/* Next Milestone */}
+                <div className="mb-4 p-3 rounded-lg bg-accent/10 border border-accent/30">
+                  <p className="text-xs text-accent mb-1">Next Milestone</p>
+                  <p className="text-sm font-medium">{selectedGoal.nextMilestone}</p>
+                  <p className="text-xs text-muted">{new Date(selectedGoal.nextMilestoneDate).toLocaleDateString()}</p>
+                </div>
+
+                {/* Tasks */}
+                <div>
+                  <p className="text-xs text-muted font-medium mb-2">Tasks</p>
+                  <div className="space-y-2">
+                    {selectedGoal.tasks.map((task) => (
                       <div
-                        className="h-2 rounded-full bg-accent"
-                        style={{ width: `${selectedAgent.progress}%` }}
-                      />
-                    </div>
+                        key={task.id}
+                        className={`p-2 rounded-lg text-xs ${
+                          task.urgent ? 'bg-red-500/10 border border-red-500/30' : 'bg-slate-900/50'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className={task.status === 'completed' ? 'text-green-400 line-through' : ''}>
+                            {task.title}
+                          </span>
+                          {task.urgent && <span>🚨</span>}
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-muted">Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                          <span className={`text-xs ${
+                            task.status === 'completed' ? 'text-green-400' :
+                            task.status === 'in-progress' ? 'text-accent' : 'text-muted'
+                          }`}>
+                            {task.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                )}
-
-                {/* ETA */}
-                {selectedAgent.eta && selectedAgent.eta !== '-' && (
-                  <div className="mb-4 p-3 rounded-lg bg-slate-900/50">
-                    <p className="text-xs text-muted mb-1">Estimated Time</p>
-                    <p className="text-sm font-medium">{selectedAgent.eta}</p>
-                  </div>
-                )}
-
-                {/* Tech Stack */}
-                {selectedAgent.techStack && selectedAgent.techStack.length > 0 && (
-                  <div className="mb-4">
-                    <p className="text-xs text-muted font-medium mb-2">Tech Stack</p>
-                    <div className="flex flex-wrap gap-1">
-                      {selectedAgent.techStack.map((tech, i) => (
-                        <span key={i} className="text-xs px-2 py-0.5 rounded bg-slate-800 text-muted">
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Features */}
-                {selectedAgent.features && selectedAgent.features.length > 0 && (
-                  <div>
-                    <p className="text-xs text-muted font-medium mb-2">Features</p>
-                    <ul className="space-y-1">
-                      {selectedAgent.features.map((feature, i) => (
-                        <li key={i} className="text-xs flex items-start gap-1.5">
-                          <span className="text-green-400 mt-0.5">✓</span>
-                          <span className="text-muted">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                </div>
               </>
             )}
           </div>
 
           {/* Right: Chat */}
-          <div className="w-2/3 flex flex-col min-h-0">
+          <div className="w-2/3 flex flex-col">
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
@@ -319,7 +311,7 @@ export function SubagentChat({ subagents, isOpen, onClose }: SubagentChatProps) 
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={`Message ${selectedAgent?.name || 'agent'}...`}
+                  placeholder={`Message about ${selectedGoal?.name || 'your goal'}...`}
                   className="flex-1 rounded-xl border border-border bg-slate-900 px-4 py-2 text-sm outline-none focus:border-accent"
                 />
                 <button

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SystemHealth } from '@/lib/mockData';
 
 interface SystemCapacityProps {
@@ -10,6 +10,17 @@ interface SystemCapacityProps {
 
 export function SystemCapacity({ health, currentAgents }: SystemCapacityProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [dashboardStatus, setDashboardStatus] = useState<'online' | 'offline' | 'checking'>('checking');
+  
+  // Check dashboard server status
+  useEffect(() => {
+    fetch('/api/eventbrite')
+      .then(res => {
+        if (res.ok) setDashboardStatus('online');
+        else setDashboardStatus('offline');
+      })
+      .catch(() => setDashboardStatus('offline'));
+  }, []);
   
   // Calculate available capacity
   const cpuAvailable = 100 - health.cpu;
@@ -153,8 +164,22 @@ export function SystemCapacity({ health, currentAgents }: SystemCapacityProps) {
             {isCollapsed ? '▶' : '▼'}
           </span>
         </div>
-        <div className={`text-xs px-3 py-1.5 rounded-full ${status.bg.replace('/10', '/20')} ${status.color} border ${status.border}`}>
-          {status.icon} {status.label}
+        <div className="flex items-center gap-2">
+          {/* Dashboard Server Status */}
+          <div className={`text-xs px-2 py-1 rounded-full border ${
+            dashboardStatus === 'online' 
+              ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+              : dashboardStatus === 'offline'
+              ? 'bg-red-500/20 text-red-400 border-red-500/30'
+              : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+          }`}>
+            {dashboardStatus === 'online' ? '🟢 Dashboard Online' : 
+             dashboardStatus === 'offline' ? '🔴 Dashboard Offline' : '🟡 Checking...'}
+          </div>
+          {/* Capacity Status */}
+          <div className={`text-xs px-3 py-1.5 rounded-full ${status.bg.replace('/10', '/20')} ${status.color} border ${status.border}`}>
+            {status.icon} {status.label}
+          </div>
         </div>
       </div>
 

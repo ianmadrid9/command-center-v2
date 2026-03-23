@@ -1,102 +1,113 @@
 'use client';
 
-import { useState } from 'react';
-import { EventbriteEvent, getAttendingByDay, toggleAttending } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
 
-interface EventbriteMonitorProps {
-  events: EventbriteEvent[];
+interface EventbriteEvent {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  start: string;
+  end?: string;
+  venue: {
+    name: string;
+    address?: string;
+    city?: string;
+    latitude?: string;
+    longitude?: string;
+  } | null;
+  distance: string;
+  is_free: boolean;
+  price?: string;
+  category: string;
+  fetched_at: string;
 }
 
-export function EventbriteMonitor({ events }: EventbriteMonitorProps) {
+export function EventbriteMonitor() {
+  const [events, setEvents] = useState<EventbriteEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [collapsedSections, setCollapsedSections] = useState({
-    'this-week': true,
-    'next-week': true,
-  });
-  const [localEvents, setLocalEvents] = useState(events);
 
-  function formatTime(time: string) {
-    const [hours, minutes] = time.split(':');
-    const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-    return `${displayHour}:${minutes} ${ampm}`;
-  }
+  useEffect(() => {
+    // Fetch real events from data file
+    fetch('/api/eventbrite')
+      .then(res => res.json())
+      .then(data => {
+        setEvents(data.events || []);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
 
-  function formatEventDate(date: string, timing: string, time: string) {
-    const d = new Date(date);
-    const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
-    const displayTime = formatTime(time);
-    
-    // Use timing to determine relative date
-    if (timing === 'today') return `Today ${displayTime} (${dayName})`;
-    if (timing === 'tomorrow') return `Tomorrow ${displayTime} (${dayName})`;
-    
-    // Calculate days from now for this-week and next-week
+  function formatDate(dateStr: string) {
+    const date = new Date(dateStr);
     const now = new Date();
-    const diffTime = d.getTime() - now.getTime();
+    const diffTime = date.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays <= 7) return `In ${diffDays} days ${displayTime} (${dayName})`;
-    return `${displayTime} (${dayName})`;
-  }
-
-  function getCategoryIcon(category: string) {
-    const icons: Record<string, string> = {
-      'Technology': '💻',
-      'Development': '⚛️',
-      'Business': '💼',
-      'HR & Management': '👥',
-      'Finance': '💰',
-      'Networking': '🤝',
-      'Marketing': '📈',
+    const options: Intl.DateTimeFormatOptions = { 
+      weekday: 'short', 
+      month: 'short', 
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit'
     };
-    return icons[category] || '📅';
+    
+    if (diffDays === 0) return `Today ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+    if (diffDays === 1) return `Tomorrow ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+    if (diffDays <= 7) return `In ${diffDays} days (${date.toLocaleDateString('en-US', { weekday: 'short' })})`;
+    
+    return date.toLocaleDateString('en-US', options);
   }
 
-  function getWorthColor(worth: string) {
-    const colors: Record<string, string> = {
-      high: 'text-green-400 bg-green-500/10 border-green-500/30',
-      medium: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
-      low: 'text-gray-400 bg-gray-500/10 border-gray-500/30',
-      avoid: 'text-red-400 bg-red-500/10 border-red-500/30',
-    };
-    return colors[worth] || colors.medium;
+  function getCategoryIcon(name: string) {
+    const lower = name.toLowerCase();
+    if (lower.includes('ai') || lower.includes('tech')) return '🤖';
+    if (lower.includes('fintech')) return '💰';
+    if (lower.includes('startup')) return '🚀';
+    if (lower.includes('networking')) return '🤝';
+    if (lower.includes('founder') || lower.includes('ceo')) return '👔';
+    return '📅';
   }
 
-  function getWorthIcon(worth: string) {
-    const icons: Record<string, string> = {
-      high: '✅',
-      medium: '🤔',
-      low: '👎',
-      avoid: '⚠️',
-    };
-    return icons[worth] || '🤔';
+  if (loading) {
+    return (
+      <div className="card p-5 w-full">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-xl">🎫</span>
+          <div>
+            <h3 className="font-medium">Eventbrite Events</h3>
+            <p className="text-xs text-muted">Loading events...</p>
+          </div>
+        </div>
+        <div className="text-center py-8 text-muted">
+          <p>🔄 Fetching latest events...</p>
+        </div>
+      </div>
+    );
   }
 
-  function handleToggleAttend(eventId: string) {
-    toggleAttending(eventId);
-    setLocalEvents([...events]);
-    setShowCalendar(true);
+  if (error) {
+    return (
+      <div className="card p-5 w-full">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-xl">🎫</span>
+          <div>
+            <h3 className="font-medium">Eventbrite Events</h3>
+            <p className="text-xs text-muted">Error loading events</p>
+          </div>
+        </div>
+        <div className="text-center py-8 text-red-400">
+          <p>⚠️ {error}</p>
+          <p className="text-xs text-muted mt-2">Run the Eventbrite Scout agent to fetch events</p>
+        </div>
+      </div>
+    );
   }
-
-  function toggleSection(timing: string) {
-    setCollapsedSections(prev => ({
-      ...prev,
-      [timing]: !prev[timing as keyof typeof prev],
-    }));
-  }
-
-  const attendingByDay = getAttendingByDay();
-  const attendingCount = events.filter(e => e.attending).length;
-
-  const timingSections = [
-    { key: 'today', label: 'Today', color: 'border-red-500/50 bg-red-500/5', collapsible: false },
-    { key: 'tomorrow', label: 'Tomorrow', color: 'border-amber-500/50 bg-amber-500/5', collapsible: false },
-    { key: 'this-week', label: 'This Week', color: 'border-blue-500/50 bg-blue-500/5', collapsible: true },
-    { key: 'next-week', label: 'Next Week', color: 'border-green-500/50 bg-green-500/5', collapsible: true },
-  ];
 
   return (
     <div className="card p-5 w-full">
@@ -104,211 +115,97 @@ export function EventbriteMonitor({ events }: EventbriteMonitorProps) {
         <div className="flex items-center gap-2">
           <span className="text-xl">🎫</span>
           <div>
-            <h3 className="font-medium">Eventbrite Meetups</h3>
-            <p className="text-xs text-muted">{events.filter(e => e.timing === 'today').length} today</p>
+            <h3 className="font-medium">Eventbrite Events</h3>
+            <p className="text-xs text-muted">
+              {events.length} events near 50th & 2nd Ave
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowCalendar(!showCalendar)}
-            className="text-xs text-accent hover:underline flex items-center gap-1"
-          >
-            📅 My Calendar ({attendingCount})
-          </button>
-          <a
-            href="https://www.eventbrite.com.ph/d/philippines--manila/events/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-muted hover:underline"
-          >
-            Browse ↗
-          </a>
-        </div>
+        <a
+          href="https://www.eventbrite.com/d/ny--new-york/tech-networking--events/?price=t"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-accent hover:underline flex items-center gap-1"
+        >
+          Browse More ↗
+        </a>
       </div>
 
-      {/* Calendar Dropdown */}
-      {showCalendar && (
-        <div className="mb-4 p-3 rounded-xl border border-accent/30 bg-accent/5">
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm font-medium">📅 My Events</h4>
-            <button
-              onClick={() => setShowCalendar(false)}
-              className="text-xs text-muted hover:text-foreground"
-            >
-              ✕
-            </button>
-          </div>
-          {attendingCount === 0 ? (
-            <p className="text-xs text-muted">No events yet. Click "I'll Attend" on any event.</p>
-          ) : (
-            <div className="space-y-3">
-              {['today', 'tomorrow', 'this-week', 'next-week'].map((timing) => {
-                const dayEvents = attendingByDay[timing as keyof typeof attendingByDay];
-                if (dayEvents.length === 0) return null;
-                return (
-                  <div key={timing}>
-                    <p className="text-xs text-muted capitalize mb-1">{timing.replace('-', ' ')}</p>
-                    {dayEvents.map((event) => (
-                      <div
-                        key={event.id}
-                        className="text-xs p-2 rounded-lg bg-slate-900/50 flex items-center justify-between"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{event.title}</p>
-                          <p className="text-muted">{formatEventDate(event.date, event.timing, event.time)}</p>
-                        </div>
-                        <button
-                          onClick={() => handleToggleAttend(event.id)}
-                          className="text-xs text-red-400 hover:text-red-300 ml-2"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+      {events.length === 0 ? (
+        <div className="text-center py-8 text-muted">
+          <p>📭 No events found</p>
+          <p className="text-xs mt-2">Run the Eventbrite Scout agent to fetch events</p>
         </div>
-      )}
-
-      {/* Events Grid */}
-      <div className="grid gap-3 md:grid-cols-2">
-        {timingSections.map((section) => {
-          const sectionEvents = events.filter(e => e.timing === section.key);
-          if (sectionEvents.length === 0) return null;
-
-          const isCollapsed = section.collapsible && collapsedSections[section.key as keyof typeof collapsedSections];
-
-          return (
+      ) : (
+        <div className="grid gap-3 md:grid-cols-2">
+          {events.slice(0, 10).map((event) => (
             <div
-              key={section.key}
-              className={`rounded-xl border p-3 ${section.color}`}
+              key={event.id}
+              className="rounded-xl border border-border/50 bg-slate-900/50 overflow-hidden"
             >
-              <div 
-                className={`flex items-center justify-between mb-2 ${section.collapsible ? 'cursor-pointer' : ''}`}
-                onClick={() => section.collapsible && toggleSection(section.key)}
+              {/* Event Header */}
+              <div
+                className="p-3 cursor-pointer hover:bg-slate-800/50 transition-colors"
+                onClick={() => setExpandedId(expandedId === event.id ? null : event.id)}
               >
-                <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-medium">{section.label}</h4>
-                  {section.collapsible && (
-                    <span className="text-xs transition-transform">
-                      {isCollapsed ? '▶' : '▼'}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted">{sectionEvents.length} events</span>
-                  {section.collapsible && isCollapsed && (
-                    <span className="text-xs text-accent">Click to expand</span>
-                  )}
-                </div>
-              </div>
-
-              {!isCollapsed && (
-              <div className="space-y-2">
-                {sectionEvents.map((event) => (
-                  <div
-                    key={event.id}
-                    className="rounded-lg bg-slate-900/50 overflow-hidden"
-                  >
-                    {/* Event Header */}
-                    <div
-                      className="p-2 cursor-pointer hover:bg-slate-800/50 transition-colors"
-                      onClick={() => setExpandedId(expandedId === event.id ? null : event.id)}
-                    >
-                      <div className="flex items-start gap-2">
-                        <span className="text-lg">{getCategoryIcon(event.category)}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{event.title}</p>
-                          <p className="text-xs text-muted truncate">{event.organizer}</p>
-                          <div className="flex items-center gap-2 mt-1 text-xs text-muted">
-                            <span>📅 {formatEventDate(event.date, event.timing, event.time)}</span>
-                          </div>
-                          <div className="flex items-center justify-between mt-1.5">
-                            <div className="flex items-center gap-2 text-xs">
-                              <span className={event.isOnline ? 'text-green-400' : 'text-muted'}>
-                                {event.isOnline ? '🌐 Online' : '📍 In-person'}
-                              </span>
-                              <span className={event.price === 'Free' ? 'text-green-400' : 'text-muted'}>
-                                {event.price}
-                                {!event.priceVerified && <span className="text-amber-400 ml-0.5">?</span>}
-                              </span>
-                            </div>
-                            <span className="text-xs text-muted">
-                              👥 {event.attendees}
-                            </span>
-                          </div>
-                          {/* Price flags */}
-                          {event.flags && event.flags.length > 0 && (
-                            <div className="mt-1 flex flex-wrap gap-1">
-                              {event.flags.map((flag, i) => (
-                                <span key={i} className="text-xs text-amber-400 bg-amber-500/10 px-1 rounded">
-                                  ⚠️ {flag}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                          {/* Early bird badge */}
-                          {event.earlyBird && (
-                            <span className="text-xs text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded mt-1 inline-block">
-                              🐦 Early bird available
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-lg">{getCategoryIcon(event.name)}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{event.name}</p>
+                    <p className="text-xs text-muted truncate">{event.venue?.name}</p>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-muted">
+                      <span>📅 {formatDate(event.start)}</span>
                     </div>
-
-                    {/* Expanded Content */}
-                    {expandedId === event.id && (
-                      <div className="p-2 pt-0 border-t border-border/50">
-                        {/* AI Insight */}
-                        {event.insight && (
-                          <div className={`mt-2 p-2 rounded-lg border text-xs ${getWorthColor(event.insight.worth)}`}>
-                            <div className="flex items-center gap-1 mb-1">
-                              <span>{getWorthIcon(event.insight.worth)}</span>
-                              <span className="font-medium capitalize">
-                                {event.insight.worth === 'high' ? 'Worth Going' : 
-                                 event.insight.worth === 'medium' ? 'Consider It' :
-                                 event.insight.worth === 'low' ? 'Low Priority' : 'Skip This'}
-                              </span>
-                            </div>
-                            <p className="opacity-90">{event.insight.reason}</p>
-                          </div>
-                        )}
-                        
-                        {/* Actions */}
-                        <div className="flex gap-2 mt-2">
-                          <button
-                            onClick={() => handleToggleAttend(event.id)}
-                            className={`flex-1 rounded-lg font-medium text-xs py-1.5 transition-colors ${
-                              event.attending
-                                ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                                : 'bg-accent text-slate-950 hover:bg-accent/90'
-                            }`}
-                          >
-                            {event.attending ? '✓ Attending' : "I'll Attend"}
-                          </button>
-                          <a
-                            href={event.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="rounded-lg bg-slate-800 font-medium text-xs px-3 py-1.5 hover:bg-slate-700 transition-colors"
-                          >
-                            ↗ Details
-                          </a>
-                        </div>
+                    <div className="flex items-center justify-between mt-1.5">
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-green-400">
+                          📍 {event.distance}
+                        </span>
+                        <span className={event.is_free ? 'text-green-400' : 'text-amber-400'}>
+                          {event.is_free ? '🆓 Free' : '💰 You Pay'}
+                        </span>
                       </div>
-                    )}
+                      {!event.is_free && (
+                        <span className="text-xs text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">
+                          ⚠️ Settle yourself
+                        </span>
+                      )}
+                    </div>
                   </div>
-                ))}
+                </div>
               </div>
+
+              {/* Expanded Content */}
+              {expandedId === event.id && (
+                <div className="p-3 pt-0 border-t border-border/50">
+                  {event.description && (
+                    <p className="text-xs text-muted mb-3 line-clamp-3">
+                      {event.description}
+                    </p>
+                  )}
+                  
+                  <div className="flex gap-2">
+                    <a
+                      href={event.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 rounded-lg bg-accent text-slate-950 font-medium text-xs py-2 text-center hover:bg-accent/90 transition-colors"
+                    >
+                      🎫 Get Tickets ↗
+                    </a>
+                    <button
+                      onClick={() => setExpandedId(null)}
+                      className="rounded-lg bg-slate-800 font-medium text-xs px-4 py-2 hover:bg-slate-700 transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

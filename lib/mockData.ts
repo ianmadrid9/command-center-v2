@@ -320,6 +320,7 @@ export interface TikTokComment {
   timestamp: string;
   sentiment: 'positive' | 'neutral' | 'negative';
   isCreator?: boolean;
+  isUrgent?: boolean;
 }
 
 // Mock TikTok Videos (last 5 days)
@@ -429,18 +430,20 @@ export const mockTikTokComments: TikTokComment[] = [
     videoId: 'tt-3',
     author: 'job_hunter_ph',
     text: 'Is Batch 9 open for application? 🙏',
-    likes: 45,
+    likes: 234,
     timestamp: '2026-03-20T23:10:00Z',
     sentiment: 'neutral',
+    isUrgent: true,
   },
   {
     id: 'tc-7',
     videoId: 'tt-1',
     author: 'hater_123',
     text: 'Another flex video? 🙄',
-    likes: 12,
+    likes: 89,
     timestamp: '2026-03-20T22:30:00Z',
     sentiment: 'negative',
+    isUrgent: true,
   },
   {
     id: 'tc-8',
@@ -510,8 +513,14 @@ export function getTikTokStats() {
     neutral: mockTikTokComments.filter(c => c.sentiment === 'neutral').length,
     negative: mockTikTokComments.filter(c => c.sentiment === 'negative').length,
   };
+  
+  const urgentComments = mockTikTokComments.filter(c => c.isUrgent);
+  const urgentBreakdown = {
+    total: urgentComments.length,
+    preview: urgentComments.length > 0 ? urgentComments[0] : null,
+  };
 
-  return { totalViews, totalLikes, totalComments, totalShares, sentimentBreakdown };
+  return { totalViews, totalLikes, totalComments, totalShares, sentimentBreakdown, urgentBreakdown };
 }
 
 export function getCommentsByVideo(videoId: string) {
@@ -547,6 +556,7 @@ export interface LinkedInComment {
   timestamp: string;
   sentiment: 'positive' | 'neutral' | 'negative';
   isCreator?: boolean;
+  isUrgent?: boolean;
 }
 
 // Mock LinkedIn Posts (last 5 days)
@@ -619,6 +629,7 @@ export const mockLinkedInComments: LinkedInComment[] = [
     likes: 234,
     timestamp: '2026-03-21T06:30:00Z',
     sentiment: 'positive',
+    isUrgent: true,
   },
   {
     id: 'lc-2',
@@ -755,8 +766,14 @@ export function getLinkedInStats() {
     neutral: mockLinkedInComments.filter(c => c.sentiment === 'neutral').length,
     negative: mockLinkedInComments.filter(c => c.sentiment === 'negative').length,
   };
+  
+  const urgentComments = mockLinkedInComments.filter(c => c.isUrgent);
+  const urgentBreakdown = {
+    total: urgentComments.length,
+    preview: urgentComments.length > 0 ? urgentComments[0] : null,
+  };
 
-  return { totalImpressions, totalLikes, totalComments, totalReposts, sentimentBreakdown };
+  return { totalImpressions, totalLikes, totalComments, totalReposts, sentimentBreakdown, urgentBreakdown };
 }
 
 export function getCommentsByPost(postId: string) {
@@ -1215,4 +1232,140 @@ export function getRecentTranscripts(limit = 5) {
   return mockTranscripts
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     .slice(0, limit);
+}
+
+// Life Goals Types
+export interface LifeGoal {
+  id: string;
+  name: string;
+  icon: string;
+  status: 'on-track' | 'needs-attention' | 'at-risk' | 'completed';
+  deadline: string;
+  progress: number;
+  nextMilestone: string;
+  nextMilestoneDate: string;
+  tasks: GoalTask[];
+  subagent: string;
+}
+
+export interface GoalTask {
+  id: string;
+  title: string;
+  dueDate: string;
+  status: 'pending' | 'in-progress' | 'completed';
+  urgent?: boolean;
+}
+
+export interface LifeGoalSubagent {
+  id: string;
+  name: string;
+  goal: string;
+  status: 'active' | 'idle' | 'completed';
+  lastActive: string;
+  nextCheckIn: string;
+}
+
+// Mock Life Goals
+export const mockLifeGoals: LifeGoal[] = [
+  {
+    id: 'goal-1',
+    name: 'MBA in NYC',
+    icon: '🎓',
+    status: 'needs-attention',
+    deadline: '2026-09-15',
+    progress: 35,
+    nextMilestone: 'GMAT Test',
+    nextMilestoneDate: '2026-04-15',
+    subagent: 'mba-nyc-advisor',
+    tasks: [
+      { id: 't1', title: 'Research MBA programs', dueDate: '2026-03-30', status: 'completed' },
+      { id: 't2', title: 'GMAT preparation', dueDate: '2026-04-15', status: 'in-progress', urgent: true },
+      { id: 't3', title: 'Write essays', dueDate: '2026-05-01', status: 'pending' },
+      { id: 't4', title: 'Get recommendations', dueDate: '2026-06-01', status: 'pending' },
+    ],
+  },
+  {
+    id: 'goal-2',
+    name: 'Run NYC Marathon',
+    icon: '🏃',
+    status: 'on-track',
+    deadline: '2026-11-03',
+    progress: 60,
+    nextMilestone: '20K Training Run',
+    nextMilestoneDate: '2026-03-29',
+    subagent: 'marathon-coach',
+    tasks: [
+      { id: 't1', title: 'Register for marathon', dueDate: '2026-02-01', status: 'completed' },
+      { id: 't2', title: 'Weekly training runs', dueDate: '2026-03-29', status: 'in-progress' },
+      { id: 't3', title: 'Nutrition plan', dueDate: '2026-04-15', status: 'pending' },
+      { id: 't4', title: 'Gear check', dueDate: '2026-10-01', status: 'pending' },
+    ],
+  },
+  {
+    id: 'goal-3',
+    name: 'Read 20 Books',
+    icon: '📚',
+    status: 'on-track',
+    deadline: '2026-12-31',
+    progress: 25,
+    nextMilestone: 'Finish Book 5',
+    nextMilestoneDate: '2026-04-01',
+    subagent: 'reading-tracker',
+    tasks: [
+      { id: 't1', title: 'Read 5 books', dueDate: '2026-04-01', status: 'in-progress' },
+      { id: 't2', title: 'Write book notes', dueDate: '2026-04-07', status: 'pending' },
+      { id: 't3', title: 'Select next 5 books', dueDate: '2026-04-10', status: 'pending' },
+    ],
+  },
+];
+
+// Mock Life Goal Subagents
+export const mockLifeGoalSubagents: LifeGoalSubagent[] = [
+  {
+    id: 'lgsa-1',
+    name: 'mba-nyc-advisor',
+    goal: 'MBA in NYC',
+    status: 'active',
+    lastActive: '2026-03-21T17:00:00Z',
+    nextCheckIn: '2026-03-22T09:00:00Z',
+  },
+  {
+    id: 'lgsa-2',
+    name: 'marathon-coach',
+    goal: 'Run NYC Marathon',
+    status: 'active',
+    lastActive: '2026-03-21T06:00:00Z',
+    nextCheckIn: '2026-03-22T06:00:00Z',
+  },
+  {
+    id: 'lgsa-3',
+    name: 'reading-tracker',
+    goal: 'Read 20 Books',
+    status: 'idle',
+    lastActive: '2026-03-20T20:00:00Z',
+    nextCheckIn: '2026-03-23T20:00:00Z',
+  },
+];
+
+// Helper functions
+export function getLifeGoalStats() {
+  const total = mockLifeGoals.length;
+  const onTrack = mockLifeGoals.filter(g => g.status === 'on-track').length;
+  const needsAttention = mockLifeGoals.filter(g => g.status === 'needs-attention').length;
+  const atRisk = mockLifeGoals.filter(g => g.status === 'at-risk').length;
+  const completed = mockLifeGoals.filter(g => g.status === 'completed').length;
+  
+  const urgentTasks = mockLifeGoals.flatMap(g => g.tasks.filter(t => t.urgent && t.status !== 'completed'));
+  
+  return { total, onTrack, needsAttention, atRisk, completed, urgentTasks };
+}
+
+export function getGoalById(id: string) {
+  return mockLifeGoals.find(g => g.id === id);
+}
+
+export function getSubagentByGoal(goalId: string) {
+  const goal = getGoalById(goalId);
+  if (!goal) return null;
+  return mockLifeGoalSubagents.find(sa => sa.name === goal.subagent);
 }

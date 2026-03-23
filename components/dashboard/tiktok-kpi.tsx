@@ -1,16 +1,16 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
-import { LinkedInComment } from '@/lib/mockData';
+import { useState, useRef, useEffect } from 'react';
+import { TikTokComment } from '@/lib/mockData';
 
-interface LinkedInMonitorProps {
-  totalImpressions: number;
+interface TikTokKpiProps {
+  totalViews: number;
   totalComments: number;
-  recentComments: LinkedInComment[];
+  recentComments: TikTokComment[];
   onClick?: () => void;
 }
 
-export function LinkedInMonitor({ totalImpressions, totalComments, recentComments, onClick }: LinkedInMonitorProps) {
+export function TikTokKpi({ totalViews, totalComments, recentComments, onClick }: TikTokKpiProps) {
   function formatNumber(num: number): string {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
     if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
@@ -24,23 +24,23 @@ export function LinkedInMonitor({ totalImpressions, totalComments, recentComment
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs text-muted">LinkedIn</p>
-          <p className="kpi">{formatNumber(totalImpressions)}</p>
+          <p className="text-xs text-muted">TikTok</p>
+          <p className="kpi">{formatNumber(totalViews)}</p>
           <p className="text-xs text-muted mt-0.5">{totalComments} comments</p>
         </div>
-        <div className="text-xl opacity-60">💼</div>
+        <div className="text-xl opacity-60">🎵</div>
       </div>
     </div>
   );
 }
 
-interface LinkedInCommentsModalProps {
+interface TikTokCommentsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  recentComments: LinkedInComment[];
+  recentComments: TikTokComment[];
 }
 
-export function LinkedInCommentsModal({ isOpen, onClose, recentComments }: LinkedInCommentsModalProps) {
+export function TikTokCommentsModal({ isOpen, onClose, recentComments }: TikTokCommentsModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Prevent body scroll when modal is open
@@ -82,6 +82,10 @@ export function LinkedInCommentsModal({ isOpen, onClose, recentComments }: Linke
     return date.toLocaleDateString();
   }
 
+  function getVideoUrlFromComment(comment: TikTokComment) {
+    return `https://www.tiktok.com/@ianmadrid_/video/${comment.id}`;
+  }
+
   const sentimentColors = {
     positive: 'text-green-400 bg-green-500/10 border-green-500/20',
     neutral: 'text-gray-400 bg-gray-500/10 border-gray-500/20',
@@ -89,9 +93,9 @@ export function LinkedInCommentsModal({ isOpen, onClose, recentComments }: Linke
   };
 
   const sentimentIcons = {
-    positive: '👍',
-    neutral: '💬',
-    negative: '⚠️',
+    positive: '😊',
+    neutral: '😐',
+    negative: '😠',
   };
 
   if (!isOpen) return null;
@@ -105,9 +109,9 @@ export function LinkedInCommentsModal({ isOpen, onClose, recentComments }: Linke
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-6 mb-6 pb-4 border-b border-border">
           <div className="flex items-center gap-4">
-            <span className="text-3xl">💼</span>
+            <span className="text-3xl">🎵</span>
             <div>
-              <h2 className="text-2xl font-semibold">LinkedIn Comments</h2>
+              <h2 className="text-2xl font-semibold">TikTok Comments</h2>
               <p className="text-sm text-muted">{recentComments.length} recent comments</p>
             </div>
           </div>
@@ -122,9 +126,14 @@ export function LinkedInCommentsModal({ isOpen, onClose, recentComments }: Linke
         {/* Comments List */}
         <div className="space-y-3">
           {recentComments.map((comment) => (
-            <div
+            <a
               key={comment.id}
-              className={`p-4 rounded-xl border ${sentimentColors[comment.sentiment]}`}
+              href={getVideoUrlFromComment(comment)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`block p-4 rounded-xl border transition-colors hover:border-accent/50 ${
+                sentimentColors[comment.sentiment]
+              }`}
             >
               <div className="flex items-start gap-3">
                 <span className="text-2xl flex-shrink-0">{sentimentIcons[comment.sentiment]}</span>
@@ -137,30 +146,28 @@ export function LinkedInCommentsModal({ isOpen, onClose, recentComments }: Linke
                       </span>
                     )}
                   </div>
-                  {comment.authorTitle && (
-                    <p className="text-xs opacity-70 mt-1">{comment.authorTitle}</p>
-                  )}
                   <p className="mt-2 text-base opacity-90">{comment.text}</p>
                   <div className="flex items-center gap-3 mt-3 text-sm opacity-70">
-                    <span>👍 {comment.likes}</span>
+                    <span>❤️ {comment.likes}</span>
                     <span>•</span>
                     <span>{formatTime(comment.timestamp)}</span>
+                    <span className="text-accent ml-auto">Open Video ↗</span>
                   </div>
                 </div>
               </div>
-            </div>
+            </a>
           ))}
         </div>
 
         {/* Footer */}
         <div className="mt-4 pt-4 border-t border-border text-center">
           <a
-            href="https://www.linkedin.com/in/ianmadrid"
+            href="https://www.tiktok.com/@ianmadrid_"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-accent hover:underline"
           >
-            View profile on LinkedIn ↗
+            View all comments on TikTok ↗
           </a>
         </div>
 

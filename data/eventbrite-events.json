@@ -1,0 +1,143 @@
+{
+  "last_updated": "2026-03-22T22:30:00.000Z",
+  "events": [
+    {
+      "id": "1984939375104",
+      "name": "AI Startup Networking Rooftop Happy Hour",
+      "description": "Join fellow AI enthusiasts and startup founders for networking at NYC's premier rooftop venue. Perfect for founders, investors, and tech professionals.",
+      "url": "https://www.eventbrite.com/e/ai-startup-networking-rooftop-happy-hour-tickets-1984939375104",
+      "start": "2026-04-13T17:30:00",
+      "venue": {
+        "name": "230 Fifth Rooftop Bar",
+        "address": "230 5th Ave",
+        "city": "New York",
+        "latitude": "40.7447",
+        "longitude": "-73.9885"
+      },
+      "distance": "0.8 miles",
+      "is_free": false,
+      "price": "$12.51",
+      "free_tickets_status": "Sold Out - Early Bird Free tickets gone",
+      "category": "networking",
+      "fetched_at": "2026-03-22T22:30:00.000Z"
+    },
+    {
+      "id": "1984322078754",
+      "name": "Fintech Startup Networking Rooftop Happy Hour",
+      "description": "Connect with fintech founders, investors, and professionals. Free networking event with 2-for-1 drinks.",
+      "url": "https://www.eventbrite.com/e/fintech-startup-networking-rooftop-happy-hour-tickets-1984322078754",
+      "start": "2026-03-25T17:30:00",
+      "venue": {
+        "name": "230 Fifth Rooftop Bar",
+        "address": "230 5th Ave",
+        "city": "New York",
+        "latitude": "40.7447",
+        "longitude": "-73.9885"
+      },
+      "distance": "0.8 miles",
+      "is_free": false,
+      "price": "$12.51",
+      "free_tickets_status": "Sold Out - Early Bird Free tickets gone",
+      "category": "networking",
+      "fetched_at": "2026-03-22T22:30:00.000Z"
+    },
+    {
+      "id": "1982871903240",
+      "name": "Tech Networking Event by Startup Valley in NYC Manhattan",
+      "description": "Weekly tech networking event for startup founders, developers, and tech professionals in Manhattan.",
+      "url": "https://www.eventbrite.com/e/tech-networking-event-by-startup-valley-in-nyc-manhattan-tickets-1982871903240",
+      "start": "2026-03-26T18:00:00",
+      "venue": {
+        "name": "Whiskey Cellar NYC",
+        "address": "74 2nd Ave",
+        "city": "New York",
+        "latitude": "40.7282",
+        "longitude": "-73.9897"
+      },
+      "distance": "1.6 miles",
+      "is_free": true,
+      "category": "networking",
+      "fetched_at": "2026-03-22T22:30:00.000Z"
+    },
+    {
+      "id": "1983083995614",
+      "name": "Women in Tech, Fintech, AI, Startups Networking Event & Elevator Pitch NYC",
+      "description": "Network with women leaders in tech, fintech, and AI. Includes elevator pitch competition and investor networking.",
+      "url": "https://www.eventbrite.com/e/women-in-tech-fintech-ai-startups-networking-event-elevator-pitch-nyc-tickets-1983083995614",
+      "start": "2026-03-25T19:00:00",
+      "venue": {
+        "name": "Off the Wagon",
+        "address": "832 8th Ave",
+        "city": "New York",
+        "latitude": "40.7589",
+        "longitude": "-73.9851"
+      },
+      "distance": "0.6 miles",
+      "is_free": false,
+      "price": "$9.85",
+      "category": "networking",
+      "fetched_at": "2026-03-22T22:30:00.000Z"
+    },
+    {
+      "id": "1984070959650",
+      "name": "Startup Tech & AI Networking | Startup Ascent NYC Manhattan",
+      "description": "Network with AI startup founders and tech entrepreneurs. Weekly networking event in East Village.",
+      "url": "https://www.eventbrite.com/e/startup-tech-ai-networking-startup-ascent-nyc-manhattan-tickets-1984070959650",
+      "start": "2026-03-26T18:00:00",
+      "venue": {
+        "name": "77 E 7th St",
+        "address": "77 E 7th St",
+        "city": "New York",
+        "latitude": "40.7265",
+        "longitude": "-73.9897"
+      },
+      "distance": "1.7 miles",
+      "is_free": true,
+      "category": "networking",
+      "fetched_at": "2026-03-22T22:30:00.000Z"
+    },
+    {
+      "id": "1983611271711",
+      "name": "NYC Tech Startups, Investors, Innovators Networking with Elevator Pitch",
+      "description": "Pitch your startup to investors and network with fellow entrepreneurs. 2-for-1 drink special.",
+      "url": "https://www.eventbrite.com/e/nyc-tech-startups-investors-innovators-networking-with-elevator-pitch-tickets-1983611271711",
+      "start": "2026-03-31T19:00:00",
+      "venue": {
+        "name": "The Laurels",
+        "address": "743 8th Ave",
+        "city": "New York",
+        "latitude": "40.7570",
+        "longitude": "-73.9885"
+      },
+      "distance": "0.5 miles",
+      "is_free": false,
+      "price": "$9.85",
+      "category": "networking",
+      "fetched_at": "2026-03-22T22:30:00.000Z"
+    },
+    {
+      "id": "1984089040731",
+      "name": "NYC Tech Mixer 2026",
+      "description": "Brooklyn's premier tech networking event. Connect with startup founders, developers, and tech investors.",
+      "url": "https://www.eventbrite.com/e/nyc-tech-mixer-2026-tickets-1984089040731",
+      "start": "2026-03-27T18:00:00",
+      "venue": {
+        "name": "Arlo Williamsburg",
+        "address": "96 Wythe Ave",
+        "city": "Brooklyn",
+        "latitude": "40.7217",
+        "longitude": "-73.9578"
+      },
+      "distance": "2.3 miles",
+      "is_free": true,
+      "category": "networking",
+      "fetched_at": "2026-03-22T22:30:00.000Z"
+    }
+  ],
+  "total_count": 7,
+  "summary": {
+    "free_events": 3,
+    "paid_events": 4,
+    "free_sold_out": 2
+  }
+}
