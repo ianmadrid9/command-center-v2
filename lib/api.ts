@@ -3,8 +3,7 @@
  * Replaces mock data with actual backend calls
  */
 
-// Types (re-export from mockData for consistency)
-export type {
+import type {
   Task,
   Subagent,
   Activity,
