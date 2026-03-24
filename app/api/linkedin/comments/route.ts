@@ -1,22 +1,34 @@
 import { NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 /**
  * LinkedIn Comments API
  * 
- * ⚠️ CURRENT STATUS: Not implemented
+ * Reads from data/linkedin-comments.json
  * 
- * LinkedIn API for personal accounts is extremely limited.
- * To get real comments, you need one of:
- * 1. LinkedIn API for Companies (requires company page)
- * 2. Third-party service
- * 3. Browser automation (check managed browser)
- * 
- * For now, returns empty data honestly.
+ * To add real comments:
+ * 1. Manually edit data/linkedin-comments.json
+ * 2. Or build browser automation to scrape
+ * 3. Or integrate LinkedIn API
  */
-export async function GET(request: Request) {
-  return NextResponse.json({
-    success: true,
-    message: 'LinkedIn API not configured. Add LinkedIn API or third-party service.',
-    comments: [],
-  });
+export async function GET() {
+  try {
+    const dataPath = path.join(process.cwd(), 'data', 'linkedin-comments.json');
+    const fileContents = await fs.readFile(dataPath, 'utf-8');
+    const data = JSON.parse(fileContents);
+    
+    return NextResponse.json({
+      success: true,
+      comments: data.comments || [],
+      last_updated: data.last_updated,
+    });
+  } catch (error) {
+    console.error('Error reading LinkedIn comments:', error);
+    return NextResponse.json({
+      success: true,
+      comments: [],
+      message: 'No LinkedIn comments yet. Add them to data/linkedin-comments.json',
+    });
+  }
 }
