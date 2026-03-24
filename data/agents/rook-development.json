@@ -1,0 +1,58 @@
+{
+  "agentId": "rook-development",
+  "name": "🦅 Rook's Development Work",
+  "status": "active",
+  "lastRun": "2026-03-24T20:45:00.000Z",
+  "nextRun": null,
+  "instructions": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-24T20:45:00.000Z",
+      "type": "info",
+      "message": "Track all development work, features built, and improvements made by Rook"
+    }
+  ],
+  "developments": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-24T19:51:49.000Z",
+      "type": "feature",
+      "message": "Created GitHub repo: ian-madrid/command-center-v2"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-24T19:53:00.000Z",
+      "type": "deployment",
+      "message": "Deployed to Vercel via managed browser automation"
+    },
+    {
+      "id": "3",
+      "timestamp": "2026-03-24T20:25:00.000Z",
+      "type": "feature",
+      "message": "Transcript Extractor: Removed input field, converted to read-only log"
+    },
+    {
+      "id": "4",
+      "timestamp": "2026-03-24T20:30:00.000Z",
+      "type": "fix",
+      "message": "Fixed deployment pipeline: GitHub → Vercel auto-deploy on git push"
+    },
+    {
+      "id": "5",
+      "timestamp": "2026-03-24T20:45:00.000Z",
+      "type": "feature",
+      "message": "Created this development work log for tracking Rook's projects"
+    }
+  ],
+  "insights": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-24T20:45:00.000Z",
+      "type": "observation",
+      "message": "User prefers chat-based workflow: paste YouTube links here, I extract and log to dashboard"
+    }
+  ],
+  "brainstorming": [],
+  "ianLastVisit": null,
+  "rookLastSummary": "2026-03-24T20:45:00.000Z"
+}
