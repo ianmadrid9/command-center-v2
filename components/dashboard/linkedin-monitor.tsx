@@ -11,6 +11,7 @@ interface LinkedInCommentsModalProps {
 export function LinkedInCommentsModal({ isOpen, onClose }: LinkedInCommentsModalProps) {
   const [comments, setComments] = useState<LinkedInComment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [apiMessage, setApiMessage] = useState<string>('');
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Fetch real comments when modal opens
@@ -21,6 +22,7 @@ export function LinkedInCommentsModal({ isOpen, onClose }: LinkedInCommentsModal
         .then(res => res.json())
         .then(data => {
           setComments(data.comments || []);
+          setApiMessage(data.message || '');
           setLoading(false);
         })
         .catch(() => {
@@ -46,12 +48,6 @@ export function LinkedInCommentsModal({ isOpen, onClose }: LinkedInCommentsModal
     const date = new Date(timestamp);
     return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   }
-
-  const sentimentColors = {
-    positive: 'text-green-400 bg-green-500/10 border-green-500/20',
-    neutral: 'text-gray-400 bg-gray-500/10 border-gray-500/20',
-    negative: 'text-red-400 bg-red-500/10 border-red-500/20',
-  };
 
   const sentimentIcons = {
     positive: '👍',
@@ -88,6 +84,11 @@ export function LinkedInCommentsModal({ isOpen, onClose }: LinkedInCommentsModal
         <div className="space-y-4 px-8 pb-8">
           {loading ? (
             <div className="text-center py-8 text-muted">Loading comments...</div>
+          ) : apiMessage ? (
+            <div className="text-center py-8">
+              <p className="text-muted mb-2">⚠️ {apiMessage}</p>
+              <p className="text-sm text-muted">Comments will appear here once LinkedIn API is configured.</p>
+            </div>
           ) : comments.length === 0 ? (
             <div className="text-center py-8 text-muted">No comments yet</div>
           ) : (

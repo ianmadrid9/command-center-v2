@@ -88,6 +88,11 @@ export function TikTokCommentsModal({ isOpen, onClose }: TikTokCommentsModalProp
         <div className="space-y-4 px-8 pb-8">
           {loading ? (
             <div className="text-center py-8 text-muted">Loading comments...</div>
+          ) : apiMessage ? (
+            <div className="text-center py-8">
+              <p className="text-muted mb-2">⚠️ {apiMessage}</p>
+              <p className="text-sm text-muted">Comments will appear here once TikTok API is configured.</p>
+            </div>
           ) : comments.length === 0 ? (
             <div className="text-center py-8 text-muted">No comments yet</div>
           ) : (

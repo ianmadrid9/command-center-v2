@@ -1,32 +1,34 @@
 import { NextResponse } from 'next/server';
 
-// Mock data for now - can be replaced with real TikTok API calls
-// TikTok doesn't have a public API, so this would need web scraping or third-party service
-
+/**
+ * TikTok Stats API
+ * 
+ * ⚠️ CURRENT STATUS: Not implemented
+ * 
+ * TikTok has no public API for personal accounts.
+ * To get real data, you need one of:
+ * 1. TikTok Business API (requires business account)
+ * 2. Third-party service (e.g., Pentos, Analisa.io)
+ * 3. Browser automation (check managed browser)
+ * 
+ * For now, returns empty data honestly.
+ */
 export async function GET() {
-  // Return mock stats for now
-  // In production, this would fetch from a TikTok data source
   return NextResponse.json({
     success: true,
-    totalViews: 1860400,
-    totalLikes: 143900,
-    totalComments: 4293,
-    totalShares: 8079,
+    message: 'TikTok API not configured. Add TikTok Business API or third-party service.',
+    totalViews: 0,
+    totalLikes: 0,
+    totalComments: 0,
+    totalShares: 0,
     sentimentBreakdown: {
-      positive: 8,
-      neutral: 3,
-      negative: 1,
+      positive: 0,
+      neutral: 0,
+      negative: 0,
     },
     urgentBreakdown: {
-      total: 2,
-      preview: {
-        id: 'tc-6',
-        author: 'job_hunter_ph',
-        text: 'Is Batch 9 open for application? 🙏',
-        likes: 234,
-        timestamp: new Date().toISOString(),
-        isUrgent: true,
-      },
+      total: 0,
+      preview: null,
     },
   });
 }
