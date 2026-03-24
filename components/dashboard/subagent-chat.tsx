@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Subagent } from '@/lib/mockData';
+import type { Subagent } from '@/lib/mockData';
 import { sendAgentMessage } from '@/lib/api';
 
 interface SubagentChatProps {

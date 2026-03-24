@@ -1,6 +1,6 @@
 'use client';
 
-import { Subagent } from '@/lib/mockData';
+import type { Subagent } from '@/lib/mockData';
 import { ProjectPreview } from './project-preview';
 
 interface ActiveProjectsProps {

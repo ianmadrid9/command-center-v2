@@ -1,6 +1,6 @@
 'use client';
 
-import { TikTokComment } from '@/lib/mockData';
+import type { TikTokComment } from '@/lib/mockData';
 
 interface TikTokMonitorProps {
   recentComments: TikTokComment[];

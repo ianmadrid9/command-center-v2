@@ -1,6 +1,6 @@
 'use client';
 
-import { QuickAction } from '@/lib/mockData';
+import type { QuickAction } from '@/lib/mockData';
 import { VersionsModal } from './versions-modal';
 import { useState } from 'react';
 

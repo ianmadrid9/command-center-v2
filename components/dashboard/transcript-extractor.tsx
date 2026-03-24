@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Transcript } from '@/lib/mockData';
+import type { Transcript } from '@/lib/mockData';
 
 interface TranscriptExtractorProps {
   transcripts?: Transcript[];

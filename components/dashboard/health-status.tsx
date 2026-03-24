@@ -1,6 +1,6 @@
 'use client';
 
-import { SystemHealth } from '@/lib/mockData';
+import type { SystemHealth } from '@/lib/mockData';
 
 interface HealthStatusProps {
   health: SystemHealth;

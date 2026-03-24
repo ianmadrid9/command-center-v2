@@ -1,0 +1,25 @@
+{
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "no-console": "warn",
+    "@typescript-eslint/no-unused-vars": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["components/**/*.tsx", "app/**/*.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["**/mockData"],
+                "message": "Mock data is forbidden in production components. Use real API endpoints (/api/*) or data files (data/*.json) instead. See REAL_DATA_MANIFEST.md for allowed sources."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

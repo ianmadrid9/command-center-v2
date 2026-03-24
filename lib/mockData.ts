@@ -1,3 +1,23 @@
+/**
+ * ⚠️ MOCK DATA - DO NOT USE IN PRODUCTION ⚠️
+ * 
+ * This file contains mock data for development ONLY.
+ * 
+ * 🚫 FORBIDDEN IN PRODUCTION:
+ * - Do NOT import this in production components
+ * - Do NOT use mock* exports in real code
+ * - Do NOT use get*Stats() functions
+ * 
+ * ✅ REAL DATA SOURCES:
+ * - API endpoints: fetch('/api/*')
+ * - Data files: data/*.json
+ * - Activity logs: data/agents/*.json
+ * 
+ * See REAL_DATA_MANIFEST.md for complete list of allowed sources.
+ * 
+ * If you use this file in production, you're lying to users.
+ */
+
 // Mock data for dashboard development - replace with real API calls later
 
 export interface Task {

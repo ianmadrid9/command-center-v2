@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
-import { LinkedInComment } from '@/lib/mockData';
+import type { LinkedInComment } from '@/lib/mockData';
 
 interface LinkedInMonitorProps {
   totalImpressions: number;
