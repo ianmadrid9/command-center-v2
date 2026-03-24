@@ -1,6 +1,20 @@
 {
   "transcripts": [
     {
+      "id": "tt-1774396080",
+      "url": "https://vt.tiktok.com/ZSucM6rmk/",
+      "title": "Importante magkaroon ng mayaman na kaibigan - @victoranastacio",
+      "author": "@victoranastacio",
+      "duration": "35s",
+      "platform": "tiktok",
+      "transcript": "Importante magkaroon ng mayaman na kaibigan para hindi maingit sa achievements mo. Kasi peke-nit mo sa kaibigan na nandiyan, mayaman. Para kumita ka ng 30,000, 'te. Hindi isip niya 30,000 is ang araw. Kasi kung iyan ang kinikita ko po na... 'Yan ba 'to? Kumita ka ng... [comedy routine about rich friends not being jealous of your success when you earn 30,000 pesos]",
+      "status": "completed",
+      "timestamp": "2026-03-24T16:48:00Z",
+      "language": "Tagalog",
+      "segments": 18,
+      "videoId": "7620808072314883348"
+    },
+    {
       "id": "tt-1774390200",
       "url": "file://v12044gd0000d6sbrefog65rq0gta8q0.mp4",
       "title": "TikTok Video - Make the Right Decision",
@@ -27,5 +41,5 @@
       "segments": 349
     }
   ],
-  "last_updated": "2026-03-24T16:43:00Z"
+  "last_updated": "2026-03-24T16:48:00Z"
 }

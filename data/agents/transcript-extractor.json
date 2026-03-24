@@ -48,6 +48,12 @@
       "timestamp": "2026-03-24T16:43:00.000Z",
       "type": "extraction",
       "message": "Extracted: TikTok video 'Make the Right Decision' - 24s, 2 segments"
+    },
+    {
+      "id": "7",
+      "timestamp": "2026-03-24T16:48:00.000Z",
+      "type": "extraction",
+      "message": "Extracted: TikTok 'Importante magkaroon ng mayaman na kaibigan' (@victoranastacio) - 35s, Tagalog, 18 segments"
     }
   ],
   "insights": [
