@@ -36,6 +36,18 @@
       "timestamp": "2026-03-24T20:30:00.000Z",
       "type": "integration",
       "message": "Uses youtube-transcript npm package (Vercel serverless compatible)"
+    },
+    {
+      "id": "5",
+      "timestamp": "2026-03-24T16:43:00.000Z",
+      "type": "feature",
+      "message": "Added TikTok transcription support via Whisper (audio extraction + STT)"
+    },
+    {
+      "id": "6",
+      "timestamp": "2026-03-24T16:43:00.000Z",
+      "type": "extraction",
+      "message": "Extracted: TikTok video 'Make the Right Decision' - 24s, 2 segments"
     }
   ],
   "insights": [
