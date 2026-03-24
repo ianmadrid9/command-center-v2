@@ -23,7 +23,6 @@ export function TranscriptExtractor() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Load transcripts on mount
   useEffect(() => {
     async function loadTranscripts() {
       try {
@@ -59,11 +58,8 @@ export function TranscriptExtractor() {
         throw new Error(data.error || 'Extraction failed');
       }
       
-      // Add new transcript to list
       setTranscripts(prev => [data.transcript, ...prev]);
       setUrl('');
-      
-      // Auto-expand the new transcript
       setExpandedId(data.transcript.id);
       
     } catch (error: any) {
@@ -92,8 +88,8 @@ export function TranscriptExtractor() {
     const hours = Math.floor(diff / 3600000);
 
     if (minutes < 1) return 'just now';
-    if (minutes < 60) return \`\${minutes}m ago\`;
-    if (hours < 24) return \`\${hours}h ago\`;
+    if (minutes < 60) return minutes + 'm ago';
+    if (hours < 24) return hours + 'h ago';
     return date.toLocaleDateString();
   }
 
@@ -117,7 +113,6 @@ export function TranscriptExtractor() {
         </span>
       </div>
 
-      {/* Input Form */}
       <form onSubmit={handleExtract} className="mb-4">
         <div className="flex gap-2">
           <input
@@ -146,12 +141,11 @@ export function TranscriptExtractor() {
           </button>
         </div>
         <p className="text-xs text-muted mt-2">
-          ✅ YouTube videos with captions enabled
+          ✓ YouTube videos with captions enabled
           <span className="ml-2 opacity-50">TikTok coming soon</span>
         </p>
       </form>
 
-      {/* Transcripts List */}
       <div className="space-y-2 max-h-96 overflow-y-auto">
         {transcripts.length === 0 ? (
           <div className="text-center py-8 text-muted">
@@ -165,7 +159,6 @@ export function TranscriptExtractor() {
               key={transcript.id}
               className="rounded-xl border border-border/50 bg-slate-900/50 overflow-hidden"
             >
-              {/* Header */}
               <div
                 className="p-3 cursor-pointer hover:bg-slate-800/50 transition-colors"
                 onClick={() => setExpandedId(expandedId === transcript.id ? null : transcript.id)}
@@ -193,14 +186,13 @@ export function TranscriptExtractor() {
                     {transcript.status === 'error' && (
                       <span className="text-xs text-red-400">Error</span>
                     )}
-                    <span className={\`text-xs transition-transform \${expandedId === transcript.id ? 'rotate-180' : ''}\`}>
+                    <span className={'text-xs transition-transform ' + (expandedId === transcript.id ? 'rotate-180' : '')}>
                       ▼
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Expanded Content */}
               {expandedId === transcript.id && transcript.status === 'completed' && (
                 <div className="p-3 pt-0 border-t border-border/50">
                   <div className="mt-3 p-3 rounded-lg bg-slate-950/50 max-h-48 overflow-y-auto text-xs leading-relaxed whitespace-pre-wrap">

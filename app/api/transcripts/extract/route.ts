@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'URL required' }, { status: 400 });
     }
     
-    // Check if it's a YouTube URL
     const isYouTube = url.includes('youtube.com') || url.includes('youtu.be');
     
     if (!isYouTube) {
@@ -24,25 +23,22 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
     
-    console.log('📺 Extracting transcript from:', url);
+    console.log('Extracting transcript from:', url);
     
-    // Run the extraction script
     const scriptPath = path.join(process.cwd(), 'scripts', 'extract-youtube-transcript.js');
     
     try {
-      const { stdout, stderr } = await execAsync(\`node "\${scriptPath}" "\${url}"\`, {
-        timeout: 30000, // 30 second timeout
+      const { stdout, stderr } = await execAsync('node "' + scriptPath + '" "' + url + '"', {
+        timeout: 30000,
       });
       
       console.log('Script output:', stdout);
       if (stderr) console.error('Script errors:', stderr);
       
-      // Read the saved transcript
       const dataPath = path.join(process.cwd(), 'data', 'transcripts.json');
       const fileContents = await fs.readFile(dataPath, 'utf-8');
       const data = JSON.parse(fileContents);
       
-      // Get the most recent transcript (the one we just saved)
       const newTranscript = data.transcripts[0];
       
       return NextResponse.json({
@@ -63,7 +59,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         error: 'Extraction failed',
         message: error.message || 'Unknown error during extraction',
-        details: 'Make sure the managed browser is running and you\\'re logged into YouTube'
+        details: 'Make sure the managed browser is running and you are logged into YouTube'
       }, { status: 500 });
     }
     
