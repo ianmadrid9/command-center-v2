@@ -1,102 +1,214 @@
 /**
- * Eventbrite RSVP Agent
+ * Eventbrite RSVP Agent - DEEP RESEARCH
  * 
- * Automatically registers for events when free or early bird tickets are found.
- * Runs after eventbrite-scout to grab tickets immediately.
- * 
- * Features:
- * - Detects newly available free/early-bird tickets
- * - Auto-RSVPs using stored user info
- * - Saves confirmation to dashboard
- * - Sends notification when successful
+ * Enhanced with:
+ * - Smart scoring based on deep research
+ * - Urgency detection (early-bird deadlines, low quantity)
+ * - Networking value assessment
+ * - Automatic prioritization
+ * - Budget tracking
  */
 
 const EVENTBRITE_API_KEY = process.env.EVENTBRITE_API_KEY;
 const EVENTBRITE_USER_EMAIL = process.env.EVENTBRITE_USER_EMAIL;
 const EVENTBRITE_USER_NAME = process.env.EVENTBRITE_USER_NAME || 'Ian Madrid';
 
-// RSVP criteria - what tickets to grab automatically
+// Enhanced RSVP criteria with scoring
 const RSVP_CRITERIA = {
-  maxPrice: 0, // Only free tickets (0 = free only)
-  grabEarlyBird: true, // Grab early bird even if not free (under this price)
-  earlyBirdMaxPrice: 15, // Max price for early bird tickets
-  minDaysUntilEvent: 1, // Don't grab tickets for events happening today
-  maxDaysUntilEvent: 60, // Don't grab tickets more than 60 days out
-  keywords: ['tech', 'startup', 'networking', 'founder', 'ceo', 'entrepreneur', 'ai', 'fintech'],
-  requireKeywords: true, // Only RSVP if event has relevant keywords
+  // Budget
+  maxMonthlyBudget: 100, // Max $100/month on events
+  maxSingleTicket: 30, // Max $30 per event
+  preferFree: true,
+  
+  // Scoring thresholds
+  minOverallScore: 60, // Only RSVP to events scoring 60+
+  minNetworkingScore: 50, // Minimum networking value
+  
+  // Urgency handling
+  grabUrgentFree: true, // Auto-grab urgent free tickets
+  grabUrgentEarlyBird: true, // Auto-grab urgent early-bird
+  
+  // Date range
+  minDaysUntilEvent: 1,
+  maxDaysUntilEvent: 60,
+  
+  // Keywords (must have at least one)
+  keywords: ['tech', 'startup', 'networking', 'founder', 'ceo', 'entrepreneur', 'ai', 'fintech', 'investor', 'venture'],
+  
+  // Priority keywords (higher score)
+  priorityKeywords: ['investor', 'venture capital', 'angel investor', 'founder', 'ceo']
 };
 
-// Check if event matches our criteria
-function shouldRSVP(event) {
+// Calculate RSVP priority score
+function calculateRSVPScore(event) {
+  let score = 0;
+  const reasons = [];
+  
+  // Base score from event research
+  score += event.overall_score || 50;
+  
+  // Ticket urgency bonus
+  if (event.ticket_urgency === 'critical') {
+    score += 30;
+    reasons.push('🚨 Critical urgency (early-bird ending)');
+  } else if (event.ticket_urgency === 'high') {
+    score += 20;
+    reasons.push('⚠️ High urgency (low quantity)');
+  } else if (event.ticket_urgency === 'medium') {
+    score += 10;
+    reasons.push('🟡 Medium urgency');
+  }
+  
+  // Free ticket bonus
+  if (event.is_free) {
+    score += 20;
+    reasons.push('🟢 FREE ticket');
+  }
+  
+  // Networking value
+  if (event.networking_score >= 80) {
+    score += 25;
+    reasons.push('💼 Excellent networking potential');
+  } else if (event.networking_score >= 60) {
+    score += 15;
+    reasons.push('👍 Good networking potential');
+  }
+  
+  // Priority keywords
+  const eventName = (event.name || '').toLowerCase();
+  const hasPriorityKeyword = RSVP_CRITERIA.priorityKeywords.some(k => eventName.includes(k));
+  if (hasPriorityKeyword) {
+    score += 20;
+    reasons.push('⭐ High-priority keyword');
+  }
+  
+  // Distance bonus (closer is better)
+  if (event.distance) {
+    const distanceNum = parseFloat(event.distance);
+    if (distanceNum < 1) {
+      score += 15;
+      reasons.push('📍 Very close (< 1 mile)');
+    } else if (distanceNum < 2) {
+      score += 10;
+      reasons.push('📍 Close (< 2 miles)');
+    }
+  }
+  
+  // Venue quality
+  if (event.venue_score >= 80) {
+    score += 10;
+    reasons.push('🏢 Great venue');
+  }
+  
+  return {
+    score: Math.min(100, score),
+    reasons,
+    priority: score >= 90 ? 'CRITICAL' : score >= 80 ? 'HIGH' : score >= 70 ? 'MEDIUM' : 'LOW'
+  };
+}
+
+// Check if event should be RSVP'd
+function shouldRSVP(event, monthlySpent = 0) {
   const eventDate = new Date(event.start);
   const now = new Date();
   const daysUntilEvent = Math.floor((eventDate - now) / (1000 * 60 * 60 * 24));
   
-  // Check date range
+  // Date range check
   if (daysUntilEvent < RSVP_CRITERIA.minDaysUntilEvent) {
-    console.log(`  ⏭️  Skipping: Event too soon (${daysUntilEvent} days)`);
-    return false;
+    return { should: false, reason: 'Event too soon' };
   }
   if (daysUntilEvent > RSVP_CRITERIA.maxDaysUntilEvent) {
-    console.log(`  ⏭️  Skipping: Event too far (${daysUntilEvent} days)`);
-    return false;
+    return { should: false, reason: 'Event too far' };
   }
   
-  // Check keywords
-  if (RSVP_CRITERIA.requireKeywords) {
-    const name = event.name.toLowerCase();
-    const desc = (event.description || '').toLowerCase();
-    const hasKeyword = RSVP_CRITERIA.keywords.some(k => name.includes(k) || desc.includes(k));
-    
-    if (!hasKeyword) {
-      console.log(`  ⏭️  Skipping: No relevant keywords`);
-      return false;
-    }
+  // Keyword check
+  const name = event.name.toLowerCase();
+  const desc = (event.description || '').toLowerCase();
+  const hasKeyword = RSVP_CRITERIA.keywords.some(k => name.includes(k) || desc.includes(k));
+  
+  if (!hasKeyword) {
+    return { should: false, reason: 'No relevant keywords' };
   }
   
-  // Check pricing
-  if (event.is_free) {
-    console.log(`  ✅ Qualifies: FREE ticket available`);
-    return true;
+  // Calculate score
+  const scoreResult = calculateRSVPScore(event);
+  
+  // Minimum score check
+  if (scoreResult.score < RSVP_CRITERIA.minOverallScore) {
+    return { 
+      should: false, 
+      reason: `Score too low (${scoreResult.score} < ${RSVP_CRITERIA.minOverallScore})`,
+      score: scoreResult
+    };
   }
   
-  // Check early bird pricing
-  if (RSVP_CRITERIA.grabEarlyBird && event.free_tickets_status?.includes('Sold Out')) {
-    const priceMatch = event.price?.match(/\$(\d+\.?\d*)/);
-    if (priceMatch) {
-      const price = parseFloat(priceMatch[1]);
-      if (price <= RSVP_CRITERIA.earlyBirdMaxPrice) {
-        console.log(`  ✅ Qualifies: Early bird at $${price} (under $${RSVP_CRITERIA.earlyBirdMaxPrice})`);
-        return true;
-      }
-    }
+  // Budget check
+  const ticketPrice = event.best_ticket?.cost || 0;
+  if (monthlySpent + ticketPrice > RSVP_CRITERIA.maxMonthlyBudget) {
+    return { 
+      should: false, 
+      reason: 'Would exceed monthly budget',
+      score: scoreResult
+    };
   }
   
-  console.log(`  ⏭️  Skipping: Doesn't meet criteria`);
-  return false;
+  if (ticketPrice > RSVP_CRITERIA.maxSingleTicket) {
+    return { 
+      should: false, 
+      reason: `Ticket too expensive ($${ticketPrice} > $${RSVP_CRITERIA.maxSingleTicket})`,
+      score: scoreResult
+    };
+  }
+  
+  // Auto-grab urgent free tickets
+  if (event.is_free && event.ticket_urgency === 'critical' && RSVP_CRITERIA.grabUrgentFree) {
+    return {
+      should: true,
+      reason: 'URGENT: Free ticket ending soon!',
+      score: scoreResult,
+      urgent: true
+    };
+  }
+  
+  // Auto-grab urgent early-bird
+  if (event.ticket_urgency === 'critical' && RSVP_CRITERIA.grabUrgentEarlyBird && ticketPrice <= RSVP_CRITERIA.maxSingleTicket) {
+    return {
+      should: true,
+      reason: 'URGENT: Early-bird ending soon!',
+      score: scoreResult,
+      urgent: true
+    };
+  }
+  
+  // Regular approval
+  return {
+    should: true,
+    reason: `Good match (score: ${scoreResult.score})`,
+    score: scoreResult,
+    urgent: false
+  };
 }
 
-// RSVP to an event
+// Enhanced RSVP with deep research
 async function rsvpToEvent(event) {
-  console.log(`\n🎫 Attempting to RSVP: ${event.name}`);
+  console.log(`\n🎫 RSVP Analysis: ${event.name}`);
+  console.log(`   Score: ${event.overall_score}/100`);
+  console.log(`   Networking: ${event.networking_rating}`);
+  console.log(`   Ticket Urgency: ${event.ticket_urgency}`);
   
   if (!EVENTBRITE_API_KEY) {
-    console.error('  ❌ EVENTBRITE_API_KEY not configured');
     return { success: false, error: 'API key missing' };
   }
   
   if (!EVENTBRITE_USER_EMAIL) {
-    console.error('  ❌ EVENTBRITE_USER_EMAIL not configured');
-    return { success: false, error: 'User email missing' };
+    return { success: false, error: 'Email missing' };
   }
   
   try {
-    // Get ticket classes for this event
+    // Get detailed ticket info
     const ticketsUrl = `https://www.eventbriteapi.com/v3/events/${event.id}/ticket_classes/`;
     const ticketsResponse = await fetch(ticketsUrl, {
-      headers: {
-        'Authorization': `Bearer ${EVENTBRITE_API_KEY}`
-      }
+      headers: { 'Authorization': `Bearer ${EVENTBRITE_API_KEY}` }
     });
     
     if (!ticketsResponse.ok) {
@@ -106,32 +218,30 @@ async function rsvpToEvent(event) {
     const ticketsData = await ticketsResponse.json();
     const ticketClasses = ticketsData.ticket_classes || [];
     
-    // Find an available free or early bird ticket
-    const eligibleTicket = ticketClasses.find(ticket => {
+    // Find best available ticket based on research
+    const bestTicket = ticketClasses.find(ticket => {
       const cost = parseFloat(ticket.cost?.value || 999);
       const isAvailable = ticket.quantity?.total > 0 && !ticket.sold_out;
-      const isFree = cost === 0;
-      const isEarlyBird = ticket.name?.toLowerCase().includes('early') && cost <= RSVP_CRITERIA.earlyBirdMaxPrice;
       
-      return isAvailable && (isFree || isEarlyBird);
+      // Prioritize: Free > Early-bird ≤$15 > Regular ≤$30
+      if (!isAvailable) return false;
+      if (cost === 0) return true; // Free is best
+      if (ticket.name?.toLowerCase().includes('early') && cost <= 15) return true;
+      if (cost <= 30) return true;
+      
+      return false;
     });
     
-    if (!eligibleTicket) {
-      console.log(`  ⚠️  No eligible tickets available`);
-      return { success: false, error: 'No eligible tickets' };
+    if (!bestTicket) {
+      return { success: false, error: 'No eligible tickets available' };
     }
     
-    console.log(`  🎫 Found ticket: ${eligibleTicket.name || 'Free Ticket'} ($${eligibleTicket.cost?.value || 0})`);
+    console.log(`   🎫 Best ticket: ${bestTicket.name || 'General'} ($${bestTicket.cost?.value || 0})`);
     
-    // Create order (RSVP)
+    // Create order
     const orderUrl = `https://www.eventbriteapi.com/v3/events/${event.id}/orders/`;
     const orderData = {
-      ticket_classes: [
-        {
-          id: eligibleTicket.id,
-          quantity: 1
-        }
-      ],
+      ticket_classes: [{ id: bestTicket.id, quantity: 1 }],
       attendee: {
         name: EVENTBRITE_USER_NAME,
         email: EVENTBRITE_USER_EMAIL
@@ -149,81 +259,72 @@ async function rsvpToEvent(event) {
     
     if (!orderResponse.ok) {
       const errorData = await orderResponse.json().catch(() => ({}));
-      throw new Error(`Order failed: ${orderResponse.status} - ${JSON.stringify(errorData)}`);
+      throw new Error(`Order failed: ${orderResponse.status}`);
     }
     
     const orderData_response = await orderResponse.json();
     
-    console.log(`  ✅ RSVP successful! Order ID: ${orderData_response.id}`);
+    console.log(`   ✅ RSVP successful! Order: ${orderData_response.id}`);
     
     return {
       success: true,
       orderId: orderData_response.id,
       eventId: event.id,
       eventName: event.name,
-      ticketName: eligibleTicket.name || 'Free Ticket',
-      price: eligibleTicket.cost?.value || 0,
+      ticketName: bestTicket.name || 'General Admission',
+      price: bestTicket.cost?.value || 0,
       eventUrl: event.url,
-      rsvpdAt: new Date().toISOString()
+      rsvpdAt: new Date().toISOString(),
+      
+      // Deep research data
+      overall_score: event.overall_score,
+      networking_rating: event.networking_rating,
+      ticket_urgency: event.ticket_urgency,
+      venue_name: event.venue?.name,
+      distance: event.distance
     };
     
   } catch (error) {
-    console.error(`  ❌ RSVP failed: ${error.message}`);
+    console.error(`   ❌ RSVP failed: ${error.message}`);
     return { success: false, error: error.message };
   }
 }
 
-// Save RSVP confirmations
+// Save RSVPs with research data
 async function saveRSVPs(rsvps) {
   const fs = require('fs').promises;
   const path = require('path');
   
   const rsvpsPath = path.join(process.cwd(), 'data', 'eventbrite-rsvps.json');
   
-  // Load existing RSVPs
   let existingRsvps = { rsvps: [], total_count: 0 };
   try {
     const existing = await fs.readFile(rsvpsPath, 'utf-8');
     existingRsvps = JSON.parse(existing);
-  } catch (e) {
-    // File doesn't exist yet
-  }
+  } catch (e) {}
   
-  // Add new RSVPs
   const newRsvps = [...(existingRsvps.rsvps || []), ...rsvps];
   
   const data = {
     last_updated: new Date().toISOString(),
     rsvps: newRsvps,
-    total_count: newRsvps.length
+    total_count: newRsvps.length,
+    total_spent: newRsvps.reduce((sum, r) => sum + (r.price || 0), 0)
   };
   
   await fs.writeFile(rsvpsPath, JSON.stringify(data, null, 2));
-  console.log(`\n💾 Saved ${rsvps.length} new RSVPs to ${rsvpsPath}`);
+  console.log(`\n💾 Saved ${rsvps.length} RSVPs`);
 }
 
-// Main agent function
+// Main function with deep research
 async function run() {
-  console.log('🎫 Eventbrite RSVP Agent starting...');
-  console.log('');
+  console.log('🎫 Eventbrite RSVP Agent (Deep Research) starting...\n');
   
   if (!EVENTBRITE_API_KEY) {
-    console.error('❌ EVENTBRITE_API_KEY not set!');
-    console.error('Set it with: openclaw env set EVENTBRITE_API_KEY=your_key_here');
-    console.error('');
-    console.error('Will check events but cannot RSVP without API key.');
-    console.log('');
+    console.log('⚠️  No API key - will analyze but not RSVP\n');
   }
   
-  if (!EVENTBRITE_USER_EMAIL) {
-    console.error('❌ EVENTBRITE_USER_EMAIL not set!');
-    console.error('Set it with: openclaw env set EVENTBRITE_USER_EMAIL=your@email.com');
-    console.error('');
-    console.error('Will check events but cannot RSVP without email.');
-    console.log('');
-  }
-  
-  // Load events from scout
+  // Load events with deep research
   const fs = require('fs').promises;
   const path = require('path');
   const eventsPath = path.join(process.cwd(), 'data', 'eventbrite-events.json');
@@ -238,31 +339,39 @@ async function run() {
   }
   
   const events = eventsData.events || [];
-  console.log(`📋 Loaded ${events.length} events from scout`);
-  console.log('');
-  console.log('🔍 Checking RSVP eligibility...');
-  console.log(`   Criteria: Free tickets OR Early Bird ≤$${RSVP_CRITERIA.earlyBirdMaxPrice}`);
-  console.log(`   Keywords: ${RSVP_CRITERIA.keywords.join(', ')}`);
-  console.log(`   Date range: ${RSVP_CRITERIA.minDaysUntilEvent}-${RSVP_CRITERIA.maxDaysUntilEvent} days`);
-  console.log('');
+  console.log(`📋 Loaded ${events.length} events with deep research\n`);
   
+  // Calculate monthly spending
+  const rsvpsPath = path.join(process.cwd(), 'data', 'eventbrite-rsvps.json');
+  let monthlySpent = 0;
+  try {
+    const existing = await fs.readFile(rsvpsPath, 'utf-8');
+    const data = JSON.parse(existing);
+    const thisMonth = new Date().getMonth();
+    const rsvpsThisMonth = data.rsvps?.filter(r => {
+      const rsvpDate = new Date(r.rsvpdAt);
+      return rsvpDate.getMonth() === thisMonth;
+    }) || [];
+    monthlySpent = rsvpsThisMonth.reduce((sum, r) => sum + (r.price || 0), 0);
+    console.log(`💰 Monthly spending: $${monthlySpent}/${RSVP_CRITERIA.maxMonthlyBudget}\n`);
+  } catch (e) {}
+  
+  // Process events
   const rsvps = [];
   
   for (const event of events) {
-    console.log(`\n📅 ${event.name}`);
-    console.log(`   ${event.start} | ${event.distance} | ${event.venue?.name}`);
-    console.log(`   ${event.is_free ? '🟢 FREE' : `💰 ${event.price} (${event.free_tickets_status})`}`);
+    const decision = shouldRSVP(event, monthlySpent);
     
-    if (shouldRSVP(event)) {
+    console.log(`\n📅 ${event.name}`);
+    console.log(`   Score: ${event.overall_score}/100 | Networking: ${event.networking_rating}`);
+    console.log(`   Ticket: ${event.is_free ? '🟢 FREE' : `💰 $${event.price}`}`);
+    console.log(`   Decision: ${decision.should ? '✅ RSVP' : '❌ Skip'} - ${decision.reason}`);
+    
+    if (decision.should) {
       const result = await rsvpToEvent(event);
       if (result.success) {
         rsvps.push(result);
-      }
-      
-      // Rate limiting - wait between RSVPs
-      if (rsvps.length % 3 === 0) {
-        console.log('  ⏳ Rate limit pause (3 RSVPs done)...');
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        monthlySpent += result.price || 0;
       }
     }
   }
@@ -272,24 +381,24 @@ async function run() {
     await saveRSVPs(rsvps);
     
     console.log('\n🎉 RSVP Agent completed!');
-    console.log(`✅ Successfully RSVP'd to ${rsvps.length} event(s):`);
+    console.log(`✅ RSVP'd to ${rsvps.length} event(s):\n`);
+    
     rsvps.forEach((rsvp, i) => {
-      console.log(`   ${i + 1}. ${rsvp.eventName}`);
-      console.log(`      Ticket: ${rsvp.ticketName} ($${rsvp.price})`);
-      console.log(`      Order: ${rsvp.orderId}`);
-      console.log(`      URL: ${rsvp.eventUrl}`);
+      console.log(`${i + 1}. ${rsvp.eventName}`);
+      console.log(`   🎫 ${rsvp.ticketName} ($${rsvp.price})`);
+      console.log(`   📊 Score: ${rsvp.overall_score}/100 | Networking: ${rsvp.networking_rating}`);
+      console.log(`   📍 ${rsvp.venue_name} (${rsvp.distance})`);
+      console.log(`   🔗 ${rsvp.eventUrl}\n`);
     });
   } else {
-    console.log('\n🎉 RSVP Agent completed!');
-    console.log('ℹ️  No new RSVPs made (all events already processed or no eligible tickets)');
+    console.log('\n✅ No new RSVPs needed');
   }
   
   return rsvps;
 }
 
-// Run the agent
 if (require.main === module) {
   run().catch(console.error);
 }
 
-module.exports = { run, shouldRSVP, rsvpToEvent };
+module.exports = { run, shouldRSVP, rsvpToEvent, calculateRSVPScore };
