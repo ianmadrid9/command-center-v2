@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 
-const execAsync = promisify(exec);
+function extractVideoId(url: string): string | null {
+  const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+  if (shortMatch) return shortMatch[1];
+  
+  const longMatch = url.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+  if (longMatch) return longMatch[1];
+  
+  return null;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,23 +29,55 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
     
-    console.log('Extracting transcript from:', url);
+    const videoId = extractVideoId(url);
+    if (!videoId) {
+      return NextResponse.json({ 
+        error: 'Invalid YouTube URL',
+        message: 'Could not extract video ID from URL'
+      }, { status: 400 });
+    }
     
-    const scriptPath = path.join(process.cwd(), 'scripts', 'extract-youtube-transcript.js');
+    console.log('Extracting transcript from:', url, '(Video ID:', videoId + ')');
+    
+    // Use youtube-transcript npm package (works in serverless)
+    const { YoutubeTranscript } = await import('youtube-transcript');
     
     try {
-      const { stdout, stderr } = await execAsync('node "' + scriptPath + '" "' + url + '"', {
-        timeout: 30000,
-      });
+      const transcriptItems = await YoutubeTranscript.fetchTranscript(videoId);
       
-      console.log('Script output:', stdout);
-      if (stderr) console.error('Script errors:', stderr);
+      if (!transcriptItems || transcriptItems.length === 0) {
+        throw new Error('No transcript available for this video');
+      }
       
+      const fullText = transcriptItems.map(item => item.text).join(' ');
+      
+      // Save to transcripts.json
       const dataPath = path.join(process.cwd(), 'data', 'transcripts.json');
-      const fileContents = await fs.readFile(dataPath, 'utf-8');
-      const data = JSON.parse(fileContents);
+      let data;
+      try {
+        const fileContents = await fs.readFile(dataPath, 'utf-8');
+        data = JSON.parse(fileContents);
+      } catch {
+        data = { transcripts: [] };
+      }
       
-      const newTranscript = data.transcripts[0];
+      const newTranscript = {
+        id: 'yt-' + Date.now(),
+        url: url,
+        title: `YouTube Video (${videoId})`,
+        author: 'YouTube',
+        duration: 'N/A',
+        platform: 'youtube' as const,
+        transcript: fullText,
+        status: 'completed' as const,
+        timestamp: new Date().toISOString(),
+        segments: transcriptItems.length,
+      };
+      
+      data.transcripts.unshift(newTranscript);
+      data.last_updated = new Date().toISOString();
+      
+      await fs.writeFile(dataPath, JSON.stringify(data, null, 2));
       
       return NextResponse.json({
         success: true,
@@ -49,17 +87,16 @@ export async function POST(request: NextRequest) {
     } catch (error: any) {
       console.error('Extraction failed:', error.message);
       
-      if (error.message.includes('timeout')) {
+      if (error.message.includes('Could not retrieve')) {
         return NextResponse.json({
-          error: 'Extraction timed out',
-          message: 'Video may be too long or page took too long to load'
-        }, { status: 500 });
+          error: 'Video unavailable',
+          message: 'This video is no longer available or has no captions enabled'
+        }, { status: 404 });
       }
       
       return NextResponse.json({
         error: 'Extraction failed',
-        message: error.message || 'Unknown error during extraction',
-        details: 'Make sure the managed browser is running and you are logged into YouTube'
+        message: error.message || 'Unknown error during extraction'
       }, { status: 500 });
     }
     

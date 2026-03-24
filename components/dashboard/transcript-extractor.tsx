@@ -16,8 +16,6 @@ interface Transcript {
 }
 
 export function TranscriptExtractor() {
-  const [url, setUrl] = useState('');
-  const [isExtracting, setIsExtracting] = useState(false);
   const [transcripts, setTranscripts] = useState<Transcript[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -38,37 +36,6 @@ export function TranscriptExtractor() {
     
     loadTranscripts();
   }, []);
-
-  async function handleExtract(e?: React.FormEvent) {
-    e?.preventDefault();
-    if (!url.trim()) return;
-
-    setIsExtracting(true);
-    
-    try {
-      const res = await fetch('/api/transcripts/extract', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
-      });
-      
-      const data = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(data.error || 'Extraction failed');
-      }
-      
-      setTranscripts(prev => [data.transcript, ...prev]);
-      setUrl('');
-      setExpandedId(data.transcript.id);
-      
-    } catch (error: any) {
-      alert('Failed to extract transcript: ' + error.message);
-      console.error('Extraction error:', error);
-    } finally {
-      setIsExtracting(false);
-    }
-  }
 
   async function handleCopy(transcript: Transcript) {
     await navigator.clipboard.writeText(transcript.transcript);
@@ -106,45 +73,18 @@ export function TranscriptExtractor() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="text-xl">📝</span>
-          <h3 className="font-medium">Transcript Extractor</h3>
+          <h3 className="font-medium">Transcript Log</h3>
         </div>
         <span className="text-xs text-muted">
-          {transcripts.filter(t => t.status === 'completed').length} extracted
+          {transcripts.filter(t => t.status === 'completed').length} transcripts
         </span>
       </div>
 
-      <form onSubmit={handleExtract} className="mb-4">
-        <div className="flex gap-2">
-          <input
-            type="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="Paste YouTube URL..."
-            className="flex-1 rounded-xl border border-border bg-slate-900 px-3 py-2 text-sm outline-none focus:border-accent"
-          />
-          <button
-            type="submit"
-            disabled={isExtracting || !url.trim()}
-            className="rounded-xl bg-accent text-slate-950 font-medium text-sm px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent/90 transition-colors"
-          >
-            {isExtracting ? (
-              <span className="flex items-center gap-1">
-                <span className="animate-spin">⏳</span>
-                Extracting
-              </span>
-            ) : (
-              <span className="flex items-center gap-1">
-                <span>🎯</span>
-                Extract
-              </span>
-            )}
-          </button>
-        </div>
-        <p className="text-xs text-muted mt-2">
-          ✓ YouTube videos with captions enabled
-          <span className="ml-2 opacity-50">TikTok coming soon</span>
+      <div className="mb-4 p-3 rounded-xl bg-slate-800/50 border border-border/50">
+        <p className="text-xs text-muted">
+          📌 <strong className="text-foreground">Paste YouTube links in chat</strong> — transcripts are extracted and logged here automatically
         </p>
-      </form>
+      </div>
 
       <div className="space-y-2 max-h-96 overflow-y-auto">
         {transcripts.length === 0 ? (
