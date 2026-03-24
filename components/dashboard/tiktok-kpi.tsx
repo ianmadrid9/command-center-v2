@@ -112,7 +112,7 @@ export function TikTokCommentsModal({ isOpen, onClose, recentComments }: TikTokC
             <span className="text-3xl">🎵</span>
             <div>
               <h2 className="text-2xl font-semibold">TikTok Comments</h2>
-              <p className="text-sm text-muted">{recentComments.length} recent comments</p>
+              <p className="text-sm text-muted">{comments.length} recent comments</p>
             </div>
           </div>
           <button
@@ -125,7 +125,12 @@ export function TikTokCommentsModal({ isOpen, onClose, recentComments }: TikTokC
 
         {/* Comments List */}
         <div className="space-y-3">
-          {recentComments.map((comment) => (
+          {loading ? (
+            <div className="text-center py-8 text-muted">Loading comments...</div>
+          ) : comments.length === 0 ? (
+            <div className="text-center py-8 text-muted">No comments yet</div>
+          ) : (
+            comments.map((comment) => (
             <a
               key={comment.id}
               href={getVideoUrlFromComment(comment)}
@@ -157,6 +162,8 @@ export function TikTokCommentsModal({ isOpen, onClose, recentComments }: TikTokC
               </div>
             </a>
           ))}
+          </div>
+        )}
         </div>
 
         {/* Footer */}
@@ -168,6 +175,18 @@ export function TikTokCommentsModal({ isOpen, onClose, recentComments }: TikTokC
             className="text-sm text-accent hover:underline"
           >
             View all comments on TikTok ↗
+          </a>
+        </div>
+
+        {/* Close Hint */}
+        <div className="mt-4 text-center text-xs text-muted">
+          Click outside to close
+        </div>
+      </div>
+    </div>
+  );
+}
+omments on TikTok ↗
           </a>
         </div>
 

@@ -230,14 +230,12 @@ export default function Dashboard() {
       <TikTokCommentsModal
         isOpen={showTikTokComments}
         onClose={() => setShowTikTokComments(false)}
-        recentComments={getRecentComments(8)}
       />
 
       {/* LinkedIn Comments Modal */}
       <LinkedInCommentsModal
         isOpen={showLinkedInComments}
         onClose={() => setShowLinkedInComments(false)}
-        recentComments={getRecentLinkedInComments(6)}
       />
 
       {/* Events & Transcript - Full Width Stacked */}

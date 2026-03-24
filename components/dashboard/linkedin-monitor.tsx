@@ -108,7 +108,7 @@ export function LinkedInCommentsModal({ isOpen, onClose, recentComments }: Linke
             <span className="text-3xl">💼</span>
             <div>
               <h2 className="text-2xl font-semibold">LinkedIn Comments</h2>
-              <p className="text-sm text-muted">{recentComments.length} recent comments</p>
+              <p className="text-sm text-muted">{comments.length} recent comments</p>
             </div>
           </div>
           <button
@@ -150,12 +150,36 @@ export function LinkedInCommentsModal({ isOpen, onClose, recentComments }: Linke
               </div>
             </div>
           ))}
+          </div>
+        )}
         </div>
 
         {/* Footer */}
         <div className="mt-4 pt-4 border-t border-border text-center">
           <a
             href="https://www.linkedin.com/in/ianmadrid"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-accent hover:underline"
+          >
+            View profile on LinkedIn ↗
+          </a>
+        </div>
+
+        {/* Close Hint */}
+        <div className="mt-4 text-center text-xs text-muted">
+          Click outside to close
+        </div>
+      </div>
+    </div>
+  );
+}
+v>
+      </div>
+    </div>
+  );
+}
+        href="https://www.linkedin.com/in/ianmadrid"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-accent hover:underline"
