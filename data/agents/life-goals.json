@@ -1,0 +1,27 @@
+{
+  "agentId": "life-goals",
+  "name": "🎯 Life Goals",
+  "status": "placeholder",
+  "lastRun": null,
+  "nextRun": null,
+  "instructions": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-24T20:48:00.000Z",
+      "type": "info",
+      "message": "Track long-term goals, milestones, and progress (placeholder - awaiting requirements)"
+    }
+  ],
+  "developments": [],
+  "insights": [],
+  "brainstorming": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-24T20:48:00.000Z",
+      "type": "question",
+      "message": "What goals should be tracked here? Career, health, learning, relationships?"
+    }
+  ],
+  "ianLastVisit": null,
+  "rookLastSummary": null
+}

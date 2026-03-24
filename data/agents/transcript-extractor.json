@@ -1,27 +1,59 @@
 {
   "agentId": "transcript-extractor",
-  "name": "📝 Transcripts",
-  "status": "healthy",
-  "lastRun": "2026-03-23T20:51:53.241Z",
+  "name": "📝 Transcript Extractor",
+  "status": "active",
+  "lastRun": "2026-03-24T20:45:00.000Z",
   "nextRun": null,
   "instructions": [
     {
       "id": "1",
-      "timestamp": "2026-03-23T23:51:53.241Z",
+      "timestamp": "2026-03-24T20:25:00.000Z",
       "type": "info",
-      "message": "Extract transcripts when URL is provided"
+      "message": "Extract YouTube transcripts when URLs are provided in chat, log to dashboard"
     }
   ],
   "developments": [
     {
       "id": "1",
-      "timestamp": "2026-03-23T20:51:53.241Z",
-      "type": "info",
-      "message": "Extracted 2 transcripts today"
+      "timestamp": "2026-03-23T20:51:53.000Z",
+      "type": "feature",
+      "message": "Initial transcript extractor created with browser automation"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-24T12:22:34.000Z",
+      "type": "extraction",
+      "message": "Extracted: Steve Wozniak interview on AI (Apple 50th anniversary) - 349 segments"
+    },
+    {
+      "id": "3",
+      "timestamp": "2026-03-24T20:25:00.000Z",
+      "type": "feature",
+      "message": "Converted to read-only log - input field removed, chat-based workflow"
+    },
+    {
+      "id": "4",
+      "timestamp": "2026-03-24T20:30:00.000Z",
+      "type": "integration",
+      "message": "Uses youtube-transcript npm package (Vercel serverless compatible)"
     }
   ],
-  "insights": [],
-  "brainstorming": [],
+  "insights": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-24T20:25:00.000Z",
+      "type": "workflow",
+      "message": "User prefers pasting links in chat vs using UI input field - cleaner workflow"
+    }
+  ],
+  "brainstorming": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-24T20:30:00.000Z",
+      "type": "idea",
+      "message": "Could add TikTok transcript extraction in future (would need different API)"
+    }
+  ],
   "ianLastVisit": null,
-  "rookLastSummary": null
+  "rookLastSummary": "2026-03-24T20:45:00.000Z"
 }

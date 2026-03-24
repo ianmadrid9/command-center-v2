@@ -1,0 +1,70 @@
+{
+  "agentId": "command-center-project",
+  "name": "🎛️ Command Center (Main Project)",
+  "status": "active",
+  "lastRun": "2026-03-24T20:48:00.000Z",
+  "nextRun": null,
+  "instructions": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-24T20:48:00.000Z",
+      "type": "info",
+      "message": "Track all development, features, and decisions for the Command Center dashboard project"
+    }
+  ],
+  "developments": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-17T00:00:00.000Z",
+      "type": "project",
+      "message": "Project started - Command Center v1"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-21T00:00:00.000Z",
+      "type": "milestone",
+      "message": "Dashboard v1.0 deployed with KPI cards, TikTok/LinkedIn monitors, Eventbrite integration"
+    },
+    {
+      "id": "3",
+      "timestamp": "2026-03-23T00:00:00.000Z",
+      "type": "architecture",
+      "message": "Mock data purge - removed all fake stats, implemented Activity Logs system"
+    },
+    {
+      "id": "4",
+      "timestamp": "2026-03-24T19:51:49.000Z",
+      "type": "milestone",
+      "message": "Command Center v2 - New GitHub repo (ianmadrid9/command-center-v2)"
+    },
+    {
+      "id": "5",
+      "timestamp": "2026-03-24T20:25:00.000Z",
+      "type": "feature",
+      "message": "Transcript Extractor converted to read-only log (chat-based workflow)"
+    },
+    {
+      "id": "6",
+      "timestamp": "2026-03-24T20:48:00.000Z",
+      "type": "feature",
+      "message": "Created per-project activity log containers for honest tracking"
+    }
+  ],
+  "insights": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-23T00:00:00.000Z",
+      "type": "principle",
+      "message": "Honesty builds trust - empty states with truth > full dashboard with fake data"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-24T20:48:00.000Z",
+      "type": "principle",
+      "message": "Every project/section needs its own activity log to prevent hallucination"
+    }
+  ],
+  "brainstorming": [],
+  "ianLastVisit": null,
+  "rookLastSummary": "2026-03-24T20:48:00.000Z"
+}

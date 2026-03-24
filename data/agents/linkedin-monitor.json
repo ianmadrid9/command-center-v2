@@ -1,27 +1,47 @@
 {
   "agentId": "linkedin-monitor",
   "name": "💼 LinkedIn Monitor",
-  "status": "healthy",
-  "lastRun": "2026-03-23T22:51:53.241Z",
-  "nextRun": "2026-03-24T00:51:53.241Z",
+  "status": "waiting_for_api",
+  "lastRun": null,
+  "nextRun": null,
   "instructions": [
     {
       "id": "1",
-      "timestamp": "2026-03-23T23:51:53.241Z",
+      "timestamp": "2026-03-21T00:00:00.000Z",
       "type": "info",
-      "message": "Check for new comments every hour"
+      "message": "Monitor LinkedIn comments, connections, and engagement"
     }
   ],
   "developments": [
     {
       "id": "1",
-      "timestamp": "2026-03-23T22:51:53.241Z",
-      "type": "info",
-      "message": "3 new comments on recent post"
+      "timestamp": "2026-03-21T00:00:00.000Z",
+      "type": "feature",
+      "message": "Initial LinkedIn monitor component created with job title display"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-23T00:00:00.000Z",
+      "type": "fix",
+      "message": "Removed mock data - now shows honest empty state with API configuration instructions"
     }
   ],
-  "insights": [],
-  "brainstorming": [],
+  "insights": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-23T00:00:00.000Z",
+      "type": "blocker",
+      "message": "Requires LinkedIn API access (company page or developer account)"
+    }
+  ],
+  "brainstorming": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-24T00:00:00.000Z",
+      "type": "idea",
+      "message": "Browser automation could fetch public profile data without full API access"
+    }
+  ],
   "ianLastVisit": null,
-  "rookLastSummary": null
+  "rookLastSummary": "2026-03-24T20:48:00.000Z"
 }

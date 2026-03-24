@@ -1,0 +1,52 @@
+{
+  "agentId": "eventbrite-automation",
+  "name": "🎫 Eventbrite Automation",
+  "status": "active",
+  "lastRun": "2026-03-24T20:48:00.000Z",
+  "nextRun": null,
+  "instructions": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-22T00:00:00.000Z",
+      "type": "info",
+      "message": "Automate event discovery, RSVP tracking, and insights for tech events"
+    }
+  ],
+  "developments": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-22T00:00:00.000Z",
+      "type": "project",
+      "message": "Eventbrite automation project started"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-22T00:00:00.000Z",
+      "type": "feature",
+      "message": "Event scraper created - fetches events from Eventbrite API"
+    },
+    {
+      "id": "3",
+      "timestamp": "2026-03-23T00:00:00.000Z",
+      "type": "feature",
+      "message": "AI insights engine - categorizes events as Worth Going/Consider It/Skip This"
+    },
+    {
+      "id": "4",
+      "timestamp": "2026-03-24T00:00:00.000Z",
+      "type": "integration",
+      "message": "Integrated with Command Center dashboard"
+    }
+  ],
+  "insights": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-24T00:00:00.000Z",
+      "type": "status",
+      "message": "Fully functional - real event data from Eventbrite API"
+    }
+  ],
+  "brainstorming": [],
+  "ianLastVisit": null,
+  "rookLastSummary": "2026-03-24T20:48:00.000Z"
+}

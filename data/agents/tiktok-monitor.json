@@ -1,49 +1,53 @@
 {
   "agentId": "tiktok-monitor",
   "name": "🎵 TikTok Monitor",
-  "status": "healthy",
-  "lastRun": "2026-03-23T21:51:53.239Z",
-  "nextRun": "2026-03-24T03:51:53.241Z",
+  "status": "waiting_for_api",
+  "lastRun": null,
+  "nextRun": null,
   "instructions": [
     {
       "id": "1",
-      "timestamp": "2026-03-23T23:51:53.241Z",
+      "timestamp": "2026-03-21T00:00:00.000Z",
       "type": "info",
-      "message": "Check for new videos every 6 hours"
-    },
-    {
-      "id": "2",
-      "timestamp": "2026-03-23T23:51:53.241Z",
-      "type": "info",
-      "message": "Alert if video gets 10K+ views in first hour"
+      "message": "Monitor TikTok comments, sentiment, and engagement for @ianmadrid_"
     }
   ],
   "developments": [
     {
       "id": "1",
-      "timestamp": "2026-03-23T21:51:53.241Z",
-      "type": "info",
-      "message": "New video posted: \"AI Startup Life\"",
-      "metadata": {
-        "views": 23000
-      }
+      "timestamp": "2026-03-21T00:00:00.000Z",
+      "type": "feature",
+      "message": "Initial TikTok monitor component created with sentiment analysis"
     },
     {
       "id": "2",
-      "timestamp": "2026-03-23T22:51:53.241Z",
-      "type": "info",
-      "message": "12 new comments, 1 from verified account"
+      "timestamp": "2026-03-23T00:00:00.000Z",
+      "type": "fix",
+      "message": "Removed mock data - now shows honest empty state with API configuration instructions"
     }
   ],
   "insights": [
     {
       "id": "1",
-      "timestamp": "2026-03-23T23:51:53.241Z",
-      "type": "suggestion",
-      "message": "Posting at 2PM shows 40% better engagement - recommend scheduling posts for this time"
+      "timestamp": "2026-03-23T00:00:00.000Z",
+      "type": "blocker",
+      "message": "Requires TikTok Business API (1-2 week approval) or third-party service (Pentos, Analisa.io ~$50-200/mo)"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-24T00:00:00.000Z",
+      "type": "alternative",
+      "message": "Browser automation workflow available as free alternative - use managed browser + cron"
     }
   ],
-  "brainstorming": [],
+  "brainstorming": [
+    {
+      "id": "1",
+      "timestamp": "2026-03-24T00:00:00.000Z",
+      "type": "idea",
+      "message": "Could use browser-based scraping via managed browser for basic stats without API"
+    }
+  ],
   "ianLastVisit": null,
-  "rookLastSummary": null
+  "rookLastSummary": "2026-03-24T20:48:00.000Z"
 }
