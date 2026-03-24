@@ -168,7 +168,7 @@ export default function Dashboard() {
         </div>
 
         {/* LinkedIn Card */}
-        <div className="card p-5 w-full cursor-pointer hover:border-accent/50 transition-colors" onClick={() => setShowLinkedInComments(true)}>
+        <div className="card p-5 w-full cursor-pointer hover:border-accent/50 transition-colors" onClick={() => setSelectedLog('linkedin-monitor')}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="text-2xl">💼</span>
@@ -177,7 +177,7 @@ export default function Dashboard() {
                 <p className="text-xs text-muted">last 3 days</p>
               </div>
             </div>
-            <span className="text-xs text-accent">Click to view comments ↗</span>
+            <span className="text-xs text-accent">Click to view activity ↗</span>
           </div>
           
           {/* Main Stats */}
@@ -256,6 +256,34 @@ export default function Dashboard() {
         <ActivityFeed activities={activities} />
         <QuickActions actions={mockQuickActions} onAction={handleQuickAction} />
       </div>
+    </div>
+  );
+
+      {/* Activity Log Modal */}
+      {selectedLog && (
+        <ActivityLogModal
+          logId={selectedLog}
+          title={
+            selectedLog === 'tiktok-monitor' ? 'TikTok' :
+            selectedLog === 'linkedin-monitor' ? 'LinkedIn' :
+            selectedLog === 'eventbrite' ? 'Eventbrite' :
+            selectedLog === 'transcript-extractor' ? 'Transcripts' :
+            selectedLog === 'system-capacity' ? 'System' :
+            selectedLog === 'activity-feed' ? 'Activity' :
+            'Activity'
+          }
+          icon={
+            selectedLog === 'tiktok-monitor' ? '🎵' :
+            selectedLog === 'linkedin-monitor' ? '💼' :
+            selectedLog === 'eventbrite' ? '🎫' :
+            selectedLog === 'transcript-extractor' ? '📝' :
+            selectedLog === 'system-capacity' ? '📊' :
+            selectedLog === 'activity-feed' ? '📋' :
+            '📄'
+          }
+          onClose={() => setSelectedLog(null)}
+        />
+      )}
     </div>
   );
 }
