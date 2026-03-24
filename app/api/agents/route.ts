@@ -1,22 +1,22 @@
 import { NextResponse } from 'next/server';
-import { getAllAgentLogs, initializeAllAgents } from '@/lib/agent-logs';
+import { getAllAgentLogs, initializeAllActivityLogs } from '@/lib/agent-logs';
 
 export async function GET() {
   try {
-    // Initialize all agents if they don't exist
-    await initializeAllAgents();
+    // Initialize all activity logs if they don't exist
+    await initializeAllActivityLogs();
     
-    // Get all agent logs
-    const agents = await getAllAgentLogs();
+    // Get all activity logs
+    const logs = await getAllAgentLogs();
     
     return NextResponse.json({
       success: true,
-      agents,
+      logs,
     });
   } catch (error) {
-    console.error('Error getting agents:', error);
+    console.error('Error getting activity logs:', error);
     return NextResponse.json(
-      { error: 'Failed to get agents' },
+      { error: 'Failed to get activity logs' },
       { status: 500 }
     );
   }

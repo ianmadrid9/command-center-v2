@@ -374,7 +374,7 @@ export function EventbriteAgent({ onClose }: EventbriteAgentProps) {
                   </div>
                 ))
               ) : (
-                <p className="text-muted text-sm">No insights yet. Rook will add suggestions here after reading logs.</p>
+                <p className="text-muted text-sm">No insights yet. Rook reads these logs and will add suggestions here.</p>
               )}
             </div>
           )}
@@ -401,5 +401,7 @@ export function EventbriteAgent({ onClose }: EventbriteAgentProps) {
         </div>
       </div>
     </div>
+  );
+}
   );
 }

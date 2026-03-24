@@ -79,11 +79,11 @@ export function DevAgentsKpi() {
     <div className="card p-5 w-full">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <span className="text-3xl">🤖</span>
+          <span className="text-3xl">📋</span>
           <div>
-            <h3 className="font-semibold text-lg">Dev Agents</h3>
+            <h3 className="font-semibold text-lg">Activity Logs</h3>
             <p className="text-sm text-muted">
-              {agents.filter(a => a.status === 'healthy').length} healthy • {agents.filter(a => a.status === 'warning' || a.status === 'error').length} need attention
+              {agents.length} logs • {agents.filter(a => a.status === 'warning' || a.status === 'error').length} need attention
             </p>
           </div>
         </div>

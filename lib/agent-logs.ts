@@ -182,8 +182,8 @@ export async function getEntriesSince(agentId: string, since: string): Promise<{
   };
 }
 
-// Predefined agent IDs for dashboard sections
-export const AGENT_IDS = {
+// Predefined activity log IDs for dashboard sections
+export const ACTIVITY_LOG_IDS = {
   TIKTOK: 'tiktok-monitor',
   LINKEDIN: 'linkedin-monitor',
   EVENTBRITE: 'eventbrite',
@@ -192,24 +192,22 @@ export const AGENT_IDS = {
   ACTIVITY_FEED: 'activity-feed',
   DEPLOYMENTS: 'deployments',
   LIFE_GOALS: 'life-goals',
-  DEV_AGENTS: 'dev-agents',
 } as const;
 
-// Initialize all default agents
-export async function initializeAllAgents(): Promise<void> {
-  const agents = [
-    { id: AGENT_IDS.TIKTOK, name: '🎵 TikTok Monitor' },
-    { id: AGENT_IDS.LINKEDIN, name: '💼 LinkedIn Monitor' },
-    { id: AGENT_IDS.EVENTBRITE, name: '🎫 Eventbrite' },
-    { id: AGENT_IDS.TRANSCRIPTS, name: '📝 Transcripts' },
-    { id: AGENT_IDS.SYSTEM_CAPACITY, name: '📊 System Capacity' },
-    { id: AGENT_IDS.ACTIVITY_FEED, name: '📋 Activity Feed' },
-    { id: AGENT_IDS.DEPLOYMENTS, name: '🚀 Deployments' },
-    { id: AGENT_IDS.LIFE_GOALS, name: '🎯 Life Goals' },
-    { id: AGENT_IDS.DEV_AGENTS, name: '🤖 Dev Agents' },
+// Initialize all default activity logs
+export async function initializeAllActivityLogs(): Promise<void> {
+  const logs = [
+    { id: ACTIVITY_LOG_IDS.TIKTOK, name: '🎵 TikTok' },
+    { id: ACTIVITY_LOG_IDS.LINKEDIN, name: '💼 LinkedIn' },
+    { id: ACTIVITY_LOG_IDS.EVENTBRITE, name: '🎫 Eventbrite' },
+    { id: ACTIVITY_LOG_IDS.TRANSCRIPTS, name: '📝 Transcripts' },
+    { id: ACTIVITY_LOG_IDS.SYSTEM_CAPACITY, name: '📊 System' },
+    { id: ACTIVITY_LOG_IDS.ACTIVITY_FEED, name: '📋 Activity' },
+    { id: ACTIVITY_LOG_IDS.DEPLOYMENTS, name: '🚀 Deployments' },
+    { id: ACTIVITY_LOG_IDS.LIFE_GOALS, name: '🎯 Life Goals' },
   ];
   
   await Promise.all(
-    agents.map(agent => initAgentLog(agent.id, agent.name))
+    logs.map(log => initAgentLog(log.id, log.name))
   );
 }
