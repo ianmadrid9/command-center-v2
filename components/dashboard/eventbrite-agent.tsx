@@ -403,5 +403,3 @@ export function EventbriteAgent({ onClose }: EventbriteAgentProps) {
     </div>
   );
 }
-  );
-}
