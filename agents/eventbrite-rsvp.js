@@ -20,9 +20,13 @@ const RSVP_CRITERIA = {
   maxSingleTicket: 30, // Max $30 per event
   preferFree: true,
   
+  // AUTO-RESERVE settings
+  autoReserveFree: true, // AUTO-RESERVE all free tickets (no confirmation needed)
+  autoReserveEarlyBird: false, // Set to true to auto-reserve early-bird ≤$15
+  
   // Scoring thresholds
-  minOverallScore: 60, // Only RSVP to events scoring 60+
-  minNetworkingScore: 50, // Minimum networking value
+  minOverallScore: 50, // Lower threshold for auto-reserve free tickets
+  minNetworkingScore: 40, // Minimum networking value
   
   // Urgency handling
   grabUrgentFree: true, // Auto-grab urgent free tickets
@@ -180,12 +184,26 @@ function shouldRSVP(event, monthlySpent = 0) {
     };
   }
   
-  // Regular approval
+  // AUTO-RESERVE FREE TICKETS
+  if (event.is_free && RSVP_CRITERIA.autoReserveFree) {
+    return {
+      should: true,
+      reason: '🟢 AUTO-RESERVE: Free ticket',
+      score: scoreResult,
+      urgent: false,
+      autoReserve: true
+    };
+  }
+  
+  // Regular approval (requires manual confirmation)
   return {
-    should: true,
-    reason: `Good match (score: ${scoreResult.score})`,
+    should: scoreResult.score >= RSVP_CRITERIA.minOverallScore,
+    reason: scoreResult.score >= RSVP_CRITERIA.minOverallScore ? 
+      `Good match (score: ${scoreResult.score})` : 
+      `Score too low (${scoreResult.score})`,
     score: scoreResult,
-    urgent: false
+    urgent: false,
+    autoReserve: false
   };
 }
 
@@ -365,14 +383,22 @@ async function run() {
     console.log(`\n📅 ${event.name}`);
     console.log(`   Score: ${event.overall_score}/100 | Networking: ${event.networking_rating}`);
     console.log(`   Ticket: ${event.is_free ? '🟢 FREE' : `💰 $${event.price}`}`);
-    console.log(`   Decision: ${decision.should ? '✅ RSVP' : '❌ Skip'} - ${decision.reason}`);
     
-    if (decision.should) {
+    if (decision.autoReserve) {
+      // AUTO-RESERVE (no confirmation needed)
+      console.log(`   🤖 AUTO-RESERVE: ${decision.reason}`);
       const result = await rsvpToEvent(event);
       if (result.success) {
         rsvps.push(result);
         monthlySpent += result.price || 0;
+        console.log(`   ✅ Reserved! Order: ${result.orderId}`);
       }
+    } else if (decision.should) {
+      // Manual confirmation needed
+      console.log(`   ✅ QUALIFIES: ${decision.reason}`);
+      console.log(`   ⚠️  Requires manual confirmation (not free)`);
+    } else {
+      console.log(`   ❌ Skip: ${decision.reason}`);
     }
   }
   
@@ -380,16 +406,34 @@ async function run() {
   if (rsvps.length > 0) {
     await saveRSVPs(rsvps);
     
-    console.log('\n🎉 RSVP Agent completed!');
-    console.log(`✅ RSVP'd to ${rsvps.length} event(s):\n`);
+    const autoReserved = rsvps.filter(r => r.price === 0);
+    const manualNeeded = events.filter(e => {
+      const decision = shouldRSVP(e, monthlySpent);
+      return decision.should && !decision.autoReserve;
+    });
     
-    rsvps.forEach((rsvp, i) => {
+    console.log('\n🎉 RSVP Agent completed!');
+    console.log(`\n✅ AUTO-RESERVED ${autoReserved.length} FREE ticket(s):\n`);
+    
+    autoReserved.forEach((rsvp, i) => {
       console.log(`${i + 1}. ${rsvp.eventName}`);
-      console.log(`   🎫 ${rsvp.ticketName} ($${rsvp.price})`);
+      console.log(`   🎫 ${rsvp.ticketName} (FREE)`);
       console.log(`   📊 Score: ${rsvp.overall_score}/100 | Networking: ${rsvp.networking_rating}`);
       console.log(`   📍 ${rsvp.venue_name} (${rsvp.distance})`);
-      console.log(`   🔗 ${rsvp.eventUrl}\n`);
+      console.log(`   🔗 ${rsvp.eventUrl}`);
+      console.log(`   ✅ ORDER CONFIRMED: ${rsvp.orderId}\n`);
     });
+    
+    if (manualNeeded.length > 0) {
+      console.log(`\n⚠️  ${manualNeeded.length} PAID event(s) qualify but need manual RSVP:\n`);
+      manualNeeded.forEach((event, i) => {
+        console.log(`${i + 1}. ${event.name}`);
+        console.log(`   💰 ${event.price}`);
+        console.log(`   📊 Score: ${event.overall_score}/100`);
+        console.log(`   🔗 ${event.url}\n`);
+      });
+      console.log('Run with API key configured to auto-reserve these, or RSVP manually on Eventbrite.');
+    }
   } else {
     console.log('\n✅ No new RSVPs needed');
   }

@@ -9,6 +9,7 @@ import { QuickActions } from '@/components/dashboard/quick-actions';
 import { SystemCapacity } from '@/components/dashboard/system-capacity';
 import { EventbriteMonitor } from '@/components/dashboard/eventbrite-monitor';
 import { TranscriptExtractor } from '@/components/dashboard/transcript-extractor';
+import { EventbriteRSVPs } from '@/components/dashboard/eventbrite-rsvps';
 import { fetchActivities, fetchSystemHealth } from '@/lib/api';
 
 export default function Dashboard() {
@@ -34,7 +35,6 @@ export default function Dashboard() {
     
     loadData();
     
-    // Refresh every 60 seconds
     const interval = setInterval(loadData, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -65,50 +65,36 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* KPI Stats - Full Width Grid */}
+      {/* KPI Stats */}
       <div className="grid gap-3 grid-cols-2 md:grid-cols-3">
-        <StatsCard
-          title="Active Tasks"
-          value="0"
-          subtitle="No active tasks"
-          icon="📋"
-        />
-        <StatsCard
-          title="Events"
-          value="Live"
-          subtitle="Check Eventbrite"
-          icon="🎫"
-        />
-        <StatsCard
-          title="Deployments"
-          value="12"
-          subtitle="this week"
-          icon="🚀"
-        />
+        <StatsCard title="Active Tasks" value="0" subtitle="No active tasks" icon="📋" />
+        <StatsCard title="Events" value="Live" subtitle="Check Eventbrite" icon="🎫" />
+        <StatsCard title="Deployments" value="12" subtitle="this week" icon="🚀" />
       </div>
 
-      {/* Dev Agents - Full Width Row */}
+      {/* Dev Agents */}
       <div>
         <DevAgentsKpi />
       </div>
 
-      {/* Life Goals - Full Width Row */}
+      {/* Life Goals */}
       <div>
         <LifeGoalsKpi />
       </div>
 
-      {/* Events & Transcript - Full Width Stacked */}
+      {/* Events & Tickets */}
       <div className="space-y-4">
         <EventbriteMonitor />
+        <EventbriteRSVPs />
         <TranscriptExtractor />
       </div>
 
-      {/* System Capacity - Full Width */}
+      {/* System Capacity */}
       <div className="space-y-4">
         {systemHealth && <SystemCapacity health={systemHealth} currentAgents={0} />}
       </div>
 
-      {/* Activity Feed & Quick Actions - Full Width Stacked */}
+      {/* Activity Feed & Quick Actions */}
       <div className="space-y-4">
         <ActivityFeed activities={activities} />
         <QuickActions onAction={handleQuickAction} />
