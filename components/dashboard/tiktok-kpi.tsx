@@ -11,6 +11,7 @@ interface TikTokCommentsModalProps {
 export function TikTokCommentsModal({ isOpen, onClose }: TikTokCommentsModalProps) {
   const [comments, setComments] = useState<TikTokComment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [apiMessage, setApiMessage] = useState<string>('');
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Fetch real comments when modal opens
