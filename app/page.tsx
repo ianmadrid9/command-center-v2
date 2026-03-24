@@ -254,7 +254,7 @@ export default function Dashboard() {
       {/* Activity Feed & Quick Actions - Full Width Stacked */}
       <div className="space-y-4">
         <ActivityFeed activities={activities} />
-        <QuickActions actions={mockQuickActions} onAction={handleQuickAction} />
+        <QuickActions onAction={handleQuickAction} />
       </div>
     </div>
   );
