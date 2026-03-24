@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { Transcript } from '@/lib/mockData';
 
 interface TranscriptExtractorProps {
-  transcripts: Transcript[];
+  transcripts?: Transcript[];
 }
 
-export function TranscriptExtractor({ transcripts }: TranscriptExtractorProps) {
+export function TranscriptExtractor({ transcripts = [] }: TranscriptExtractorProps) {
   const [url, setUrl] = useState('');
   const [isExtracting, setIsExtracting] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);

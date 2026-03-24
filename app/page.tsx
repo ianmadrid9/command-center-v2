@@ -11,7 +11,7 @@ import { QuickActions } from '@/components/dashboard/quick-actions';
 import { SystemCapacity } from '@/components/dashboard/system-capacity';
 import { EventbriteMonitor } from '@/components/dashboard/eventbrite-monitor';
 import { TranscriptExtractor } from '@/components/dashboard/transcript-extractor';
-import { fetchTikTokStats, fetchLinkedInStats, getRecentComments, getRecentLinkedInComments, fetchActivities, fetchSystemHealth, mockQuickActions, mockTranscripts } from '@/lib/api';
+import { fetchTikTokStats, fetchLinkedInStats, getRecentComments, getRecentLinkedInComments, fetchActivities, fetchSystemHealth } from '@/lib/api';
 
 export default function Dashboard() {
   const [showTikTokComments, setShowTikTokComments] = useState(false);
@@ -243,7 +243,7 @@ export default function Dashboard() {
       {/* Events & Transcript - Full Width Stacked */}
       <div className="space-y-4">
         <EventbriteMonitor />
-        <TranscriptExtractor transcripts={mockTranscripts} />
+        <TranscriptExtractor />
       </div>
 
       {/* System Capacity - Full Width */}
@@ -257,5 +257,8 @@ export default function Dashboard() {
         <QuickActions actions={mockQuickActions} onAction={handleQuickAction} />
       </div>
     </div>
+  );
+}
+
   );
 }

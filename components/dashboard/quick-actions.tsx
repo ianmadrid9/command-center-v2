@@ -5,11 +5,16 @@ import { VersionsModal } from './versions-modal';
 import { useState } from 'react';
 
 interface QuickActionsProps {
-  actions: QuickAction[];
+  actions?: QuickAction[];
   onAction?: (action: string) => void;
 }
 
-export function QuickActions({ actions, onAction }: QuickActionsProps) {
+const defaultActions: QuickAction[] = [
+  { id: '1', label: 'Spawn Agent', icon: '🤖', action: 'spawn', variant: 'primary' },
+  { id: '2', label: 'Refresh', icon: '🔄', action: 'refresh', variant: 'default' },
+];
+
+export function QuickActions({ actions = defaultActions, onAction }: QuickActionsProps) {
   const [showVersions, setShowVersions] = useState(false);
   
   const variantStyles = {
