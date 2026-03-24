@@ -1,47 +1,34 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { LinkedInComment } from '@/lib/mockData';
-
-interface LinkedInMonitorProps {
-  totalImpressions: number;
-  totalComments: number;
-  recentComments: LinkedInComment[];
-  onClick?: () => void;
-}
-
-export function LinkedInMonitor({ totalImpressions, totalComments, recentComments, onClick }: LinkedInMonitorProps) {
-  function formatNumber(num: number): string {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
-    return num.toString();
-  }
-
-  return (
-    <div
-      className="card p-4 w-full cursor-pointer hover:border-accent/50 transition-colors"
-      onClick={onClick}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs text-muted">LinkedIn</p>
-          <p className="kpi">{formatNumber(totalImpressions)}</p>
-          <p className="text-xs text-muted mt-0.5">{totalComments} comments</p>
-        </div>
-        <div className="text-xl opacity-60">💼</div>
-      </div>
-    </div>
-  );
-}
 
 interface LinkedInCommentsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  recentComments: LinkedInComment[];
 }
 
-export function LinkedInCommentsModal({ isOpen, onClose, recentComments }: LinkedInCommentsModalProps) {
+export function LinkedInCommentsModal({ isOpen, onClose }: LinkedInCommentsModalProps) {
+  const [comments, setComments] = useState<LinkedInComment[]>([]);
+  const [loading, setLoading] = useState(true);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Fetch real comments when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setLoading(true);
+      fetch('/api/linkedin/comments')
+        .then(res => res.json())
+        .then(data => {
+          setComments(data.comments || []);
+          setLoading(false);
+        })
+        .catch(() => {
+          setComments([]);
+          setLoading(false);
+        });
+    }
+  }, [isOpen]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -55,31 +42,9 @@ export function LinkedInCommentsModal({ isOpen, onClose, recentComments }: Linke
     };
   }, [isOpen]);
 
-  // Close when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        onClose();
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isOpen, onClose]);
-
   function formatTime(timestamp: string) {
     const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-
-    if (hours < 1) return 'just now';
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 5) return `${days}d ago`;
-    return date.toLocaleDateString();
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   }
 
   const sentimentColors = {
@@ -90,7 +55,7 @@ export function LinkedInCommentsModal({ isOpen, onClose, recentComments }: Linke
 
   const sentimentIcons = {
     positive: '👍',
-    neutral: '💬',
+    neutral: '😐',
     negative: '⚠️',
   };
 
@@ -120,38 +85,46 @@ export function LinkedInCommentsModal({ isOpen, onClose, recentComments }: Linke
         </div>
 
         {/* Comments List */}
-        <div className="space-y-3">
-          {recentComments.map((comment) => (
-            <div
-              key={comment.id}
-              className={`p-4 rounded-xl border ${sentimentColors[comment.sentiment]}`}
-            >
-              <div className="flex items-start gap-3">
-                <span className="text-2xl flex-shrink-0">{sentimentIcons[comment.sentiment]}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{comment.author}</span>
-                    {comment.isCreator && (
-                      <span className="text-xs bg-accent text-slate-950 px-2 py-0.5 rounded">
-                        YOU
-                      </span>
-                    )}
-                  </div>
-                  {comment.authorTitle && (
-                    <p className="text-xs opacity-70 mt-1">{comment.authorTitle}</p>
-                  )}
-                  <p className="mt-2 text-base opacity-90">{comment.text}</p>
-                  <div className="flex items-center gap-3 mt-3 text-sm opacity-70">
-                    <span>👍 {comment.likes}</span>
-                    <span>•</span>
-                    <span>{formatTime(comment.timestamp)}</span>
+        <div className="space-y-4 px-8 pb-8">
+          {loading ? (
+            <div className="text-center py-8 text-muted">Loading comments...</div>
+          ) : comments.length === 0 ? (
+            <div className="text-center py-8 text-muted">No comments yet</div>
+          ) : (
+            comments.map((comment) => (
+              <div
+                key={comment.id}
+                className={`p-4 rounded-xl border ${
+                  comment.sentiment === 'positive' ? 'bg-green-500/5 border-green-500/20' :
+                  comment.sentiment === 'negative' ? 'bg-red-500/5 border-red-500/20' :
+                  'bg-slate-900/50 border-border/50'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl flex-shrink-0">{sentimentIcons[comment.sentiment]}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{comment.author}</span>
+                      {comment.authorTitle && (
+                        <span className="text-xs text-muted">{comment.authorTitle}</span>
+                      )}
+                      {comment.isCreator && (
+                        <span className="text-xs bg-accent text-slate-950 px-2 py-0.5 rounded">
+                          YOU
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-2 text-base opacity-90">{comment.text}</p>
+                    <div className="flex items-center gap-3 mt-3 text-sm opacity-70">
+                      <span>👍 {comment.likes}</span>
+                      <span>•</span>
+                      <span>{formatTime(comment.timestamp)}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-          </div>
-        )}
+            ))
+          )}
         </div>
 
         {/* Footer */}
@@ -164,33 +137,6 @@ export function LinkedInCommentsModal({ isOpen, onClose, recentComments }: Linke
           >
             View profile on LinkedIn ↗
           </a>
-        </div>
-
-        {/* Close Hint */}
-        <div className="mt-4 text-center text-xs text-muted">
-          Click outside to close
-        </div>
-      </div>
-    </div>
-  );
-}
-v>
-      </div>
-    </div>
-  );
-}
-        href="https://www.linkedin.com/in/ianmadrid"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-accent hover:underline"
-          >
-            View profile on LinkedIn ↗
-          </a>
-        </div>
-
-        {/* Close Hint */}
-        <div className="mt-4 text-center text-xs text-muted">
-          Click outside to close
         </div>
       </div>
     </div>

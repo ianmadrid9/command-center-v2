@@ -3,45 +3,32 @@
 import { useState, useRef, useEffect } from 'react';
 import type { TikTokComment } from '@/lib/mockData';
 
-interface TikTokKpiProps {
-  totalViews: number;
-  totalComments: number;
-  recentComments: TikTokComment[];
-  onClick?: () => void;
-}
-
-export function TikTokKpi({ totalViews, totalComments, recentComments, onClick }: TikTokKpiProps) {
-  function formatNumber(num: number): string {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
-    return num.toString();
-  }
-
-  return (
-    <div
-      className="card p-4 w-full cursor-pointer hover:border-accent/50 transition-colors"
-      onClick={onClick}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs text-muted">TikTok</p>
-          <p className="kpi">{formatNumber(totalViews)}</p>
-          <p className="text-xs text-muted mt-0.5">{totalComments} comments</p>
-        </div>
-        <div className="text-xl opacity-60">🎵</div>
-      </div>
-    </div>
-  );
-}
-
 interface TikTokCommentsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  recentComments: TikTokComment[];
 }
 
-export function TikTokCommentsModal({ isOpen, onClose, recentComments }: TikTokCommentsModalProps) {
+export function TikTokCommentsModal({ isOpen, onClose }: TikTokCommentsModalProps) {
+  const [comments, setComments] = useState<TikTokComment[]>([]);
+  const [loading, setLoading] = useState(true);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Fetch real comments when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setLoading(true);
+      fetch('/api/tiktok/comments')
+        .then(res => res.json())
+        .then(data => {
+          setComments(data.comments || []);
+          setLoading(false);
+        })
+        .catch(() => {
+          setComments([]);
+          setLoading(false);
+        });
+    }
+  }, [isOpen]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -55,35 +42,9 @@ export function TikTokCommentsModal({ isOpen, onClose, recentComments }: TikTokC
     };
   }, [isOpen]);
 
-  // Close when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        onClose();
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isOpen, onClose]);
-
   function formatTime(timestamp: string) {
     const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-
-    if (hours < 1) return 'just now';
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 5) return `${days}d ago`;
-    return date.toLocaleDateString();
-  }
-
-  function getVideoUrlFromComment(comment: TikTokComment) {
-    return `https://www.tiktok.com/@ianmadrid_/video/${comment.id}`;
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   }
 
   const sentimentColors = {
@@ -124,46 +85,44 @@ export function TikTokCommentsModal({ isOpen, onClose, recentComments }: TikTokC
         </div>
 
         {/* Comments List */}
-        <div className="space-y-3">
+        <div className="space-y-4 px-8 pb-8">
           {loading ? (
             <div className="text-center py-8 text-muted">Loading comments...</div>
           ) : comments.length === 0 ? (
             <div className="text-center py-8 text-muted">No comments yet</div>
           ) : (
             comments.map((comment) => (
-            <a
-              key={comment.id}
-              href={getVideoUrlFromComment(comment)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`block p-4 rounded-xl border transition-colors hover:border-accent/50 ${
-                sentimentColors[comment.sentiment]
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <span className="text-2xl flex-shrink-0">{sentimentIcons[comment.sentiment]}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{comment.author}</span>
-                    {comment.isCreator && (
-                      <span className="text-xs bg-accent text-slate-950 px-2 py-0.5 rounded">
-                        YOU
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-2 text-base opacity-90">{comment.text}</p>
-                  <div className="flex items-center gap-3 mt-3 text-sm opacity-70">
-                    <span>❤️ {comment.likes}</span>
-                    <span>•</span>
-                    <span>{formatTime(comment.timestamp)}</span>
-                    <span className="text-accent ml-auto">Open Video ↗</span>
+              <div
+                key={comment.id}
+                className={`p-4 rounded-xl border ${
+                  comment.sentiment === 'positive' ? 'bg-green-500/5 border-green-500/20' :
+                  comment.sentiment === 'negative' ? 'bg-red-500/5 border-red-500/20' :
+                  'bg-slate-900/50 border-border/50'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl flex-shrink-0">{sentimentIcons[comment.sentiment]}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{comment.author}</span>
+                      {comment.isCreator && (
+                        <span className="text-xs bg-accent text-slate-950 px-2 py-0.5 rounded">
+                          YOU
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-2 text-base opacity-90">{comment.text}</p>
+                    <div className="flex items-center gap-3 mt-3 text-sm opacity-70">
+                      <span>❤️ {comment.likes}</span>
+                      <span>•</span>
+                      <span>{formatTime(comment.timestamp)}</span>
+                      <span className="text-accent ml-auto">Open Video ↗</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </a>
-          ))}
-          </div>
-        )}
+            ))
+          )}
         </div>
 
         {/* Footer */}
@@ -174,25 +133,8 @@ export function TikTokCommentsModal({ isOpen, onClose, recentComments }: TikTokC
             rel="noopener noreferrer"
             className="text-sm text-accent hover:underline"
           >
-            View all comments on TikTok ↗
+            View profile on TikTok ↗
           </a>
-        </div>
-
-        {/* Close Hint */}
-        <div className="mt-4 text-center text-xs text-muted">
-          Click outside to close
-        </div>
-      </div>
-    </div>
-  );
-}
-omments on TikTok ↗
-          </a>
-        </div>
-
-        {/* Close Hint */}
-        <div className="mt-4 text-center text-xs text-muted">
-          Click outside to close
         </div>
       </div>
     </div>
