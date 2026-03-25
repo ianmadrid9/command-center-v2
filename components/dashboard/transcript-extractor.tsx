@@ -90,8 +90,6 @@ export function TranscriptExtractor() {
       </div>
     );
   }
-    return date.toLocaleDateString();
-  }
 
   if (loading) {
     return (
