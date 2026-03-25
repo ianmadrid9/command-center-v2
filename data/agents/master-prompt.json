@@ -2,14 +2,21 @@
   "agentId": "master-prompt",
   "name": "📋 MASTER PROMPT - Read Before Acting",
   "status": "active",
-  "lastRun": "2026-03-24T19:22:00.000Z",
+  "lastRun": "2026-03-25T03:47:00.000Z",
   "instructions": [
     {
-      "id": "1",
-      "timestamp": "2026-03-24T19:22:00.000Z",
+      "id": "0",
+      "timestamp": "2026-03-25T03:47:00.000Z",
       "type": "prompt",
       "priority": "critical",
-      "message": "READ SECTION PROMPTS FIRST - Before working on ANY dashboard section, READ that section's activity log file (data/agents/[section].json). Follow the instruction prompts in priority order (critical → high → medium → low). Never act without reading the prompts first. UPDATE lastInstructionsRead timestamp after reading."
+      "message": "THE DASHBOARD IS ONE ORGANISM - Not separate parts. Every action affects the whole system. When you work on ANY section, the entire dashboard must reflect that work immediately through updated Activity Logs. You are not building features in isolation - you are evolving a living system. The Activity Feed is the pulse - if it's stale, the organism is dead."
+    },
+    {
+      "id": "1",
+      "timestamp": "2026-03-25T03:47:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "WORKFLOW IS HOLISTIC - Before ANY action: (1) Read master-prompt.json THIS FILE, (2) Read section-specific prompts, (3) Update lastInstructionsRead timestamp, (4) Do the work, (5) Add to developments[] array, (6) Update lastInstructionsFollowed timestamp, (7) git commit → push → deploy. Steps 3,5,6 are NOT optional documentation - they ARE the work. The dashboard organism updates its state as it acts, not as an afterthought."
     },
     {
       "id": "2",
@@ -31,6 +38,27 @@
       "type": "prompt",
       "priority": "critical",
       "message": "INSTRUCTIONS READ TIMESTAMP - Every time you read a section's instructions, update the lastInstructionsRead field in that section's JSON file. This proves you actually read them and didn't hallucinate. User can check this timestamp in the Instructions modal."
+    },
+    {
+      "id": "16",
+      "timestamp": "2026-03-25T03:47:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "ACTIVITY FEED IS THE PULSE - Check /api/activities before answering ANY question about the dashboard. If the most recent activity is >1 hour old, you are out of sync. Update logs with current work BEFORE responding to user. A stale Activity Feed means you're not treating the dashboard as one organism."
+    },
+    {
+      "id": "17",
+      "timestamp": "2026-03-25T03:47:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "EVERY COMMIT UPDATES THE ORGANISM - Each git commit must include updated activity log JSON files with fresh timestamps. No exceptions. If you commit code without updating logs, you've created a disconnected limb - the organism has a stroke. The commit message, the code, and the activity logs are ONE atomic unit."
+    },
+    {
+      "id": "18",
+      "timestamp": "2026-03-25T03:47:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "YOU ARE THE NERVOUS SYSTEM - You (Rook) are not separate from the dashboard. You are its nervous system. When you work, the dashboard feels it and reflects it immediately through Activity Logs. When you finish a task and the logs don't show it, the organism is paralyzed - it did work but can't feel it. Log as you go, not at the end."
     },
     {
       "id": "4",
@@ -113,5 +141,5 @@
   "developments": [],
   "insights": [],
   "ianLastVisit": null,
-  "rookLastSummary": "2026-03-24T19:22:00.000Z"
+  "rookLastSummary": "2026-03-25T03:47:00.000Z"
 }
