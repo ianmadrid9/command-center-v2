@@ -9,10 +9,11 @@ interface InstructionsModalProps {
     priority: string;
     message: string;
   }>;
+  lastFollowed?: string;
   trigger?: React.ReactNode;
 }
 
-export function InstructionsModal({ sectionName, instructions, trigger }: InstructionsModalProps) {
+export function InstructionsModal({ sectionName, instructions, lastFollowed, trigger }: InstructionsModalProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const priorityColors: Record<string, string> = {
@@ -111,6 +112,11 @@ export function InstructionsModal({ sectionName, instructions, trigger }: Instru
               <p className="text-xs text-muted text-center">
                 I read these instructions before working on this section to ensure I follow the correct workflow.
               </p>
+              {lastFollowed && (
+                <p className="text-[10px] text-muted text-center mt-2 flex items-center justify-center gap-1">
+                  ✅ Last followed: {new Date(lastFollowed).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                </p>
+              )}
             </div>
           </div>
         </div>

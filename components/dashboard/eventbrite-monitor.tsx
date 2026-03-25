@@ -120,11 +120,15 @@ export function EventbriteMonitor() {
             <p className="text-xs text-muted">
               {events.length} events near 50th & 2nd Ave
             </p>
+            <p className="text-[10px] text-muted mt-1 flex items-center gap-1">
+              ✅ Instructions followed: Mar 24, 2026
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <InstructionsModal
             sectionName="Eventbrite Monitor"
+            lastFollowed="2026-03-24T19:22:00.000Z"
             instructions={[
               { id: '2', priority: 'critical', message: 'CHECK FOR FREE TICKETS FIRST - Always scan for free tickets, flag with 🎁 FREE badge' },
               { id: '3', priority: 'critical', message: 'PRICE VERIFICATION - Never show unverified prices, mark with ⚠️' },

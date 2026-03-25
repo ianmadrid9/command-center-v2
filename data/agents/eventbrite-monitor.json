@@ -3,6 +3,7 @@
   "name": "🎫 Eventbrite Monitor",
   "status": "active",
   "lastRun": "2026-03-24T20:48:00.000Z",
+  "lastInstructionsFollowed": "2026-03-24T19:22:00.000Z",
   "nextRun": null,
   "instructions": [
     {

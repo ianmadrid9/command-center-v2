@@ -74,11 +74,17 @@ export function TranscriptExtractor() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="text-xl">📝</span>
-          <h3 className="font-medium">Transcript Log</h3>
+          <div>
+            <h3 className="font-medium">Transcript Log</h3>
+            <p className="text-[10px] text-muted mt-0.5">
+              ✅ Instructions followed: Mar 24, 2026
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <InstructionsModal
             sectionName="Transcript Extractor"
+            lastFollowed="2026-03-24T19:22:00.000Z"
             instructions={[
               { id: '2', priority: 'critical', message: 'YouTube: youtube-transcript npm (API, NO browser) - Fast 1-2s' },
               { id: '3', priority: 'critical', message: 'TikTok: yt-dlp + Whisper - Download + AI transcribe (30-60s)' },
