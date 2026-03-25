@@ -61,6 +61,38 @@ export function TranscriptExtractor() {
     return date.toLocaleDateString();
   }
 
+  function formatTranscript(text: string) {
+    // Split into paragraphs at natural breaks (periods followed by capital letters or newlines)
+    const paragraphs = text
+      // First, split on double newlines if they exist
+      .split(/\n\n+/)
+      // If no double newlines, split on sentence endings followed by capital letters
+      .flatMap(p => {
+        if (p.includes('\n')) return p.split('\n');
+        // Split long paragraphs into sentences
+        const sentences = p.match(/[^.!?]+[.!?]+(\s|$)/g) || [p];
+        // Group sentences into chunks of 2-3 for better readability
+        const chunks: string[] = [];
+        for (let i = 0; i < sentences.length; i += 3) {
+          chunks.push(sentences.slice(i, i + 3).join('').trim());
+        }
+        return chunks;
+      })
+      .filter(p => p.trim().length > 0);
+
+    return (
+      <div className="space-y-4">
+        {paragraphs.map((paragraph, index) => (
+          <p key={index} className="text-gray-300">
+            {paragraph.trim()}
+          </p>
+        ))}
+      </div>
+    );
+  }
+    return date.toLocaleDateString();
+  }
+
   if (loading) {
     return (
       <div className="card p-5 w-full">
@@ -162,8 +194,8 @@ export function TranscriptExtractor() {
 
               {expandedId === transcript.id && transcript.status === 'completed' && (
                 <div className="p-3 pt-0 border-t border-border/50">
-                  <div className="mt-3 p-3 rounded-lg bg-slate-950/50 max-h-48 overflow-y-auto text-xs leading-relaxed whitespace-pre-wrap">
-                    {transcript.transcript}
+                  <div className="mt-3 p-4 rounded-lg bg-slate-950/50 max-h-96 overflow-y-auto text-sm leading-relaxed">
+                    {formatTranscript(transcript.transcript)}
                   </div>
                   <div className="flex gap-2 mt-3">
                     <button
