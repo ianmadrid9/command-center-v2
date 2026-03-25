@@ -14,7 +14,7 @@ interface InstructionsModalProps {
   trigger?: React.ReactNode;
 }
 
-export function InstructionsModal({ sectionName, instructions, lastFollowed, trigger }: InstructionsModalProps) {
+export function InstructionsModal({ sectionName, instructions, lastFollowed, lastRead, trigger }: InstructionsModalProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const priorityColors: Record<string, string> = {
