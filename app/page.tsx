@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DevAgentsKpi } from '@/components/dashboard/dev-agents-kpi';
 import { LifeGoalsKpi } from '@/components/dashboard/life-goals-kpi';
 import { ActivityFeed } from '@/components/dashboard/activity-feed';
 import { EventbriteMonitor } from '@/components/dashboard/eventbrite-monitor';
@@ -54,11 +53,6 @@ export default function Dashboard() {
       <div>
         <h1 className="text-3xl font-semibold">Clawmmand Center</h1>
         <p className="mt-1 text-sm text-muted">Your projects. Your conversations. Your progress.</p>
-      </div>
-
-      {/* Dev Agents */}
-      <div>
-        <DevAgentsKpi />
       </div>
 
       {/* Life Goals */}
