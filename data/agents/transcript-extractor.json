@@ -2,9 +2,9 @@
   "agentId": "transcript-extractor",
   "name": "📝 Transcript Extractor",
   "status": "active",
-  "lastRun": "2026-03-25T03:10:00.000Z",
-  "lastInstructionsFollowed": "2026-03-25T03:10:00.000Z",
-  "lastInstructionsRead": "2026-03-25T03:10:00.000Z",
+  "lastRun": "2026-03-25T04:43:00.000Z",
+  "lastInstructionsFollowed": "2026-03-25T04:43:00.000Z",
+  "lastInstructionsRead": "2026-03-25T04:43:00.000Z",
   "nextRun": null,
   "instructions": [
     {
@@ -117,6 +117,12 @@
       "timestamp": "2026-03-25T03:05:00.000Z",
       "type": "feature",
       "message": "Added Last Read timestamp to prove I read prompts before acting (prevents hallucination)"
+    },
+    {
+      "id": "10",
+      "timestamp": "2026-03-25T04:43:00.000Z",
+      "type": "extraction",
+      "message": "Extracted: 'The Ground Will Rewild Your Body' - Natural mobility tutorial (Katie Bowman, orca whale analogy, 5 ground positions for mobility) - 174 segments, English"
     }
   ],
   "insights": [
