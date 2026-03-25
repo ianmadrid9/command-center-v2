@@ -2,31 +2,27 @@
 
 import { useState } from 'react';
 
-interface Instruction {
-  id: string;
-  timestamp?: string;
-  type?: string;
-  priority: 'critical' | 'high' | 'medium' | 'low';
-  message: string;
-}
-
 interface InstructionsModalProps {
   sectionName: string;
-  instructions: Partial<Instruction>[];
+  instructions: Array<{
+    id: string;
+    priority: string;
+    message: string;
+  }>;
   trigger?: React.ReactNode;
 }
 
 export function InstructionsModal({ sectionName, instructions, trigger }: InstructionsModalProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const priorityColors = {
+  const priorityColors: Record<string, string> = {
     critical: 'bg-red-500/20 text-red-400 border-red-500/30',
     high: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
     medium: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     low: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
   };
 
-  const priorityIcons = {
+  const priorityIcons: Record<string, string> = {
     critical: '🔴',
     high: '🟠',
     medium: '🔵',
@@ -34,13 +30,12 @@ export function InstructionsModal({ sectionName, instructions, trigger }: Instru
   };
 
   const sortedInstructions = [...instructions].sort((a, b) => {
-    const priorityOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
-    return (priorityOrder[a.priority || 'low'] || 3) - (priorityOrder[b.priority || 'low'] || 3);
+    const order: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+    return (order[a.priority] || 3) - (order[b.priority] || 3);
   });
 
   return (
     <>
-      {/* Trigger Button */}
       {trigger ? (
         <div onClick={() => setIsOpen(true)}>{trigger}</div>
       ) : (
@@ -53,7 +48,6 @@ export function InstructionsModal({ sectionName, instructions, trigger }: Instru
         </button>
       )}
 
-      {/* Modal */}
       {isOpen && (
         <div 
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -78,12 +72,11 @@ export function InstructionsModal({ sectionName, instructions, trigger }: Instru
             
             <div className="flex-1 overflow-y-auto p-5">
               {instructions.length === 0 ? (
-                <p className="text-center text-muted py-8">No instructions defined for this section</p>
+                <p className="text-center text-muted py-8">No instructions defined</p>
               ) : (
                 <div className="space-y-3">
-                  {/* Group by priority */}
-                  {(['critical', 'high', 'medium', 'low'] as const).map((priority) => {
-                    const priorityInstructions = sortedInstructions.filter(i => (i.priority || 'low') === priority);
+                  {(['critical', 'high', 'medium', 'low']).map((priority) => {
+                    const priorityInstructions = sortedInstructions.filter(i => i.priority === priority);
                     if (priorityInstructions.length === 0) return null;
                     
                     return (
@@ -97,7 +90,7 @@ export function InstructionsModal({ sectionName, instructions, trigger }: Instru
                         {priorityInstructions.map((instruction) => (
                           <div
                             key={instruction.id}
-                            className={`p-3 rounded-lg border ${priorityColors[priority]}`}
+                            className={`p-3 rounded-lg border ${priorityColors[priority] || priorityColors.low}`}
                           >
                             <div className="flex items-start gap-2">
                               <span className="text-xs font-mono opacity-50 mt-0.5">
@@ -105,11 +98,6 @@ export function InstructionsModal({ sectionName, instructions, trigger }: Instru
                               </span>
                               <p className="text-sm leading-relaxed">{instruction.message}</p>
                             </div>
-                            {instruction.type !== 'prompt' && (
-                              <p className="text-xs mt-2 opacity-70">
-                                Type: {instruction.type}
-                              </p>
-                            )}
                           </div>
                         ))}
                       </div>
@@ -121,7 +109,7 @@ export function InstructionsModal({ sectionName, instructions, trigger }: Instru
             
             <div className="p-5 border-t border-border bg-slate-900/50">
               <p className="text-xs text-muted text-center">
-                These instructions guide how I work on this section. I read them before taking any action.
+                I read these instructions before working on this section to ensure I follow the correct workflow.
               </p>
             </div>
           </div>
