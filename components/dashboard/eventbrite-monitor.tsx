@@ -206,31 +206,33 @@ export function EventbriteMonitor() {
                 <div className="flex items-start gap-2">
                   <span className="text-lg">{getCategoryIcon(event.name)}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{event.name}</p>
-                    <p className="text-xs text-muted truncate">{event.venue?.name}</p>
-                    <div className="flex items-center gap-2 mt-1 text-xs text-muted">
-                      <span>📅 {formatDate(event.start)}</span>
-                    </div>
-                    <div className="flex items-center justify-between mt-1.5">
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-green-400">
-                          📍 {event.distance}
-                        </span>
-                        <span className={event.is_free ? 'text-green-400' : 'text-amber-400'}>
-                          {event.is_free ? '🆓 Free' : '💰 You Pay'}
-                        </span>
-                      </div>
-                      {event.is_free ? (
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <p className="text-sm font-medium truncate">{event.name}</p>
+                      {event.is_free && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleReserve(event);
                           }}
-                          className="text-xs bg-accent text-slate-950 px-2 py-0.5 rounded-full font-medium hover:bg-accent/90 transition-colors"
+                          className="text-xs bg-accent text-slate-950 px-2 py-0.5 rounded-full font-medium hover:bg-accent/90 transition-colors flex-shrink-0"
+                          title="Reserve free ticket"
                         >
                           🎫 Reserve
                         </button>
-                      ) : (
+                      )}
+                    </div>
+                    <p className="text-xs text-muted truncate">{event.venue?.name}</p>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-muted">
+                      <span>📅 {formatDate(event.start)}</span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1.5 text-xs">
+                      <span className="text-green-400">
+                        📍 {event.distance}
+                      </span>
+                      <span className={event.is_free ? 'text-green-400' : 'text-amber-400'}>
+                        {event.is_free ? '🆓 Free' : '💰 You Pay'}
+                      </span>
+                      {!event.is_free && (
                         <span className="text-xs text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">
                           ⚠️ Settle yourself
                         </span>
