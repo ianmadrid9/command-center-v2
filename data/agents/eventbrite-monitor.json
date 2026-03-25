@@ -2,9 +2,9 @@
   "agentId": "eventbrite-monitor",
   "name": "🎫 Eventbrite Monitor",
   "status": "active",
-  "lastRun": "2026-03-25T03:10:00.000Z",
-  "lastInstructionsFollowed": "2026-03-25T03:10:00.000Z",
-  "lastInstructionsRead": "2026-03-25T03:10:00.000Z",
+  "lastRun": "2026-03-25T04:54:00.000Z",
+  "lastInstructionsFollowed": "2026-03-25T04:54:00.000Z",
+  "lastInstructionsRead": "2026-03-25T04:54:00.000Z",
   "nextRun": null,
   "instructions": [
     {
@@ -120,6 +120,18 @@
       "timestamp": "2026-03-25T03:00:00.000Z",
       "type": "feature",
       "message": "Added Instructions Modal with 📋 button - view prompts and timestamps"
+    },
+    {
+      "id": "7",
+      "timestamp": "2026-03-25T04:54:00.000Z",
+      "type": "workflow",
+      "message": "Demonstrated prompt-following procedure: Read prompts → Check data → Follow priority order → Update logs → Commit"
+    },
+    {
+      "id": "8",
+      "timestamp": "2026-03-25T04:54:00.000Z",
+      "type": "status",
+      "message": "FREE tickets detection: Working (3 free events found). Price verification: Working. Auto-reserve: Working. Selling fast alerts: TODO"
     }
   ],
   "insights": [
