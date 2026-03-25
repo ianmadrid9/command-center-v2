@@ -2,9 +2,9 @@
   "agentId": "eventbrite-monitor",
   "name": "🎫 Eventbrite Monitor",
   "status": "active",
-  "lastRun": "2026-03-24T20:48:00.000Z",
-  "lastInstructionsFollowed": "2026-03-24T19:22:00.000Z",
-  "lastInstructionsRead": "2026-03-24T19:51:00.000Z",
+  "lastRun": "2026-03-25T03:10:00.000Z",
+  "lastInstructionsFollowed": "2026-03-25T03:10:00.000Z",
+  "lastInstructionsRead": "2026-03-25T03:10:00.000Z",
   "nextRun": null,
   "instructions": [
     {
@@ -102,6 +102,24 @@
       "timestamp": "2026-03-23T00:00:00.000Z",
       "type": "data",
       "message": "Uses real data from data/eventbrite-events.json"
+    },
+    {
+      "id": "4",
+      "timestamp": "2026-03-25T02:50:00.000Z",
+      "type": "feature",
+      "message": "Added full automation: Auto-reserve FREE tickets with QR code workflow"
+    },
+    {
+      "id": "5",
+      "timestamp": "2026-03-25T02:55:00.000Z",
+      "type": "feature",
+      "message": "Added 🎫 Reserve button next to event title (prevents misclicks)"
+    },
+    {
+      "id": "6",
+      "timestamp": "2026-03-25T03:00:00.000Z",
+      "type": "feature",
+      "message": "Added Instructions Modal with 📋 button - view prompts and timestamps"
     }
   ],
   "insights": [
