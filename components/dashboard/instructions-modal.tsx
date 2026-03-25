@@ -114,16 +114,16 @@ export function InstructionsModal({ sectionName, instructions, lastFollowed, tri
                 I read these instructions before working on this section to ensure I follow the correct workflow.
               </p>
               <div className="mt-2 space-y-1 text-[10px] text-muted text-center flex flex-col items-center gap-1">
-                {lastRead && (
+                {lastRead ? (
                   <p className="flex items-center gap-1">
                     📖 Last read: {new Date(lastRead).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
                   </p>
-                )}
-                {lastFollowed && (
+                ) : null}
+                {lastFollowed ? (
                   <p className="flex items-center gap-1">
                     ✅ Last followed: {new Date(lastFollowed).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
                   </p>
-                )}
+                ) : null}
               </div>
               {!lastRead && !lastFollowed && (
                 <p className="text-[10px] text-muted text-center mt-2">
