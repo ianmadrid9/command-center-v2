@@ -10,6 +10,34 @@
       "timestamp": "2026-03-24T20:48:00.000Z",
       "type": "info",
       "message": "Track all development, features, and decisions for the Command Center dashboard project"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "NO MOCK DATA EVER - Never display fake stats, fake comments, or fake activity. Show honest empty states with configuration instructions. Empty truth > Full lies"
+    },
+    {
+      "id": "3",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "ACTIVITY LOGS FIRST - Before answering any question about the dashboard, READ data/agents/*.json files. Know what's logged. Never hallucinate features or status"
+    },
+    {
+      "id": "4",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "high",
+      "message": "LOG YOUR WORK - Every feature built, every fix made, every decision - log it in the appropriate data/agents/*.json file under 'developments' array"
+    },
+    {
+      "id": "5",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "high",
+      "message": "PRE-COMMIT CHECKS - Run mock data scan before every commit. Block any fake data from entering codebase"
     }
   ],
   "developments": [

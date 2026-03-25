@@ -10,6 +10,48 @@
       "timestamp": "2026-03-22T00:00:00.000Z",
       "type": "info",
       "message": "Automate event discovery, RSVP tracking, and insights for tech events"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "EVENTBRITE API INTEGRATION - Use Eventbrite API to fetch real events. Endpoint: /api/eventbrite. Cache for 1 hour max"
+    },
+    {
+      "id": "3",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "FREE TICKETS PRIORITY - Always check and highlight free events first. This is the #1 filter Ian cares about"
+    },
+    {
+      "id": "4",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "high",
+      "message": "AI INSIGHTS ENGINE - For each event, analyze: Is it relevant to Ian's interests (tech, AI, startups)? Is the price reasonable? Is it selling fast? Provide Worth Going/Consider It/Skip This recommendation"
+    },
+    {
+      "id": "5",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "high",
+      "message": "PRICE VERIFICATION - Never display prices without checking they're current. Mark unverified with ⚠️. Check event page directly if unsure"
+    },
+    {
+      "id": "6",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "medium",
+      "message": "EARLY BIRD DETECTION - Identify early bird pricing and show deadlines. Badge these events"
+    },
+    {
+      "id": "7",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "medium",
+      "message": "RSVP TRACKING - When Ian marks 'I'll Attend', save to data/eventbrite-rsvps.json and sync with Eventbrite API if possible"
     }
   ],
   "developments": [

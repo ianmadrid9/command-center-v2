@@ -10,6 +10,34 @@
       "timestamp": "2026-03-24T20:45:00.000Z",
       "type": "info",
       "message": "Track all development work, features built, and improvements made by Rook"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "READ MEMORY FIRST - Before starting any task, read data/agents/*.json to understand current state. Never work in ignorance of existing logs"
+    },
+    {
+      "id": "3",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "LOG EVERY SESSION - At end of each work session, log: What you built, what you fixed, what you learned, what needs attention next"
+    },
+    {
+      "id": "4",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "high",
+      "message": "PREVENT HALLUCINATION - Only report what's in the logs. If unsure, say 'Let me check' and read the files. Never make up features, status, or capabilities"
+    },
+    {
+      "id": "5",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "high",
+      "message": "SECTION PROMPTS - Each dashboard section has its own instruction prompt in its JSON file. Read and follow those prompts when working on that section"
     }
   ],
   "developments": [

@@ -10,6 +10,27 @@
       "timestamp": "2026-03-21T00:00:00.000Z",
       "type": "info",
       "message": "Monitor server health, uptime, and system metrics"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "REAL METRICS ONLY - Pull actual server metrics from /api/system/health. Never fake or cache old data. Metrics include: uptime, memory usage, CPU, response times"
+    },
+    {
+      "id": "3",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "high",
+      "message": "ALERT ON THRESHOLDS - If memory >80%, CPU >90%, or response time >2s, show warning indicator. If >95%, show critical alert"
+    },
+    {
+      "id": "4",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "medium",
+      "message": "AUTO-REFRESH - Poll /api/system/health every 60 seconds. Update UI without full page reload"
     }
   ],
   "developments": [

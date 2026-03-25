@@ -10,6 +10,27 @@
       "timestamp": "2026-03-24T20:48:00.000Z",
       "type": "info",
       "message": "Track all Vercel deployments, build status, and release history"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "AUTO-DEPLOY ON PUSH - Every git push to main branch triggers Vercel deployment. Log each deployment with: URL, status, duration, commit message"
+    },
+    {
+      "id": "3",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "high",
+      "message": "DEPLOYMENT STATUS - Track: Building, Ready, Error. Show build time. On error, show error message from Vercel"
+    },
+    {
+      "id": "4",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "medium",
+      "message": "PRODUCTION ALIAS - Main deployment URL is command-center-v2-iota.vercel.app (always points to latest)"
     }
   ],
   "developments": [

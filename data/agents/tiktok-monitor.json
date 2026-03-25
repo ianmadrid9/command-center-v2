@@ -10,6 +10,34 @@
       "timestamp": "2026-03-21T00:00:00.000Z",
       "type": "info",
       "message": "Monitor TikTok comments, sentiment, and engagement for @ianmadrid_"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "HONEST EMPTY STATE - If TikTok API not configured, show clear message: 'TikTok API not connected. Options: Business API (1-2 week approval), Third-party (Pentos/Analisa.io ~$50-200/mo), Browser automation (free)'. Do NOT show fake stats"
+    },
+    {
+      "id": "3",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "high",
+      "message": "SENTIMENT ANALYSIS - When API connected, analyze comment sentiment: Positive (green), Neutral (gray), Negative (red). Show breakdown percentage"
+    },
+    {
+      "id": "4",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "high",
+      "message": "ENGAGEMENT METRICS - Track: Views, Likes, Comments, Shares. Show trends (up/down vs previous period)"
+    },
+    {
+      "id": "5",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "medium",
+      "message": "BROWSER AUTOMATION FALLBACK - If no API, offer browser-based scraping via managed browser. Slower but free"
     }
   ],
   "developments": [

@@ -10,6 +10,34 @@
       "timestamp": "2026-03-21T00:00:00.000Z",
       "type": "info",
       "message": "Monitor LinkedIn comments, connections, and engagement"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "HONEST EMPTY STATE - If LinkedIn API not configured, show clear message: 'LinkedIn API not connected. Requires: Company page or Developer account'. Do NOT show fake stats"
+    },
+    {
+      "id": "3",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "high",
+      "message": "JOB TITLE DISPLAY - Show commenter's job title and company when available. Helps Ian prioritize responses"
+    },
+    {
+      "id": "4",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "high",
+      "message": "YOUR REPLIES HIGHLIGHTED - Mark comments you've already replied to. Show reply text inline or on hover"
+    },
+    {
+      "id": "5",
+      "timestamp": "2026-03-24T17:56:00.000Z",
+      "type": "prompt",
+      "priority": "medium",
+      "message": "ENGAGEMENT METRICS - Track: Post views, Likes, Comments, Shares. Show trends over time"
     }
   ],
   "developments": [
