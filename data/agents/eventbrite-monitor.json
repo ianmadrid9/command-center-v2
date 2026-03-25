@@ -59,6 +59,20 @@
       "type": "prompt",
       "priority": "low",
       "message": "I'LL ATTEND CALENDAR - Allow user to mark events they'll attend. Store in data/eventbrite-rsvps.json and show in RSVPs section"
+    },
+    {
+      "id": "9",
+      "timestamp": "2026-03-24T19:22:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "QR CODE WORKFLOW - When user reserves free/early bird ticket: (1) Use managed browser to book on Eventbrite, (2) Scrape QR code from confirmation page/email, (3) Save to data/eventbrite-tickets.json via POST /api/eventbrite/tickets, (4) Display in My Tickets section on dashboard"
+    },
+    {
+      "id": "10",
+      "timestamp": "2026-03-24T19:22:00.000Z",
+      "type": "prompt",
+      "priority": "high",
+      "message": "AUTO-RESERVE BUTTON - For FREE events, show '🎁 Reserve Now' button. On click: book via browser automation, save QR code, add to My Tickets"
     }
   ],
   "developments": [

@@ -6,6 +6,7 @@ import { ActivityFeed } from '@/components/dashboard/activity-feed';
 import { EventbriteMonitor } from '@/components/dashboard/eventbrite-monitor';
 import { TranscriptExtractor } from '@/components/dashboard/transcript-extractor';
 import { EventbriteRSVPs } from '@/components/dashboard/eventbrite-rsvps';
+import { MyTickets } from '@/components/dashboard/my-tickets';
 import { SystemCapacity } from '@/components/dashboard/system-capacity';
 import { fetchActivities, fetchSystemHealth } from '@/lib/api';
 
@@ -60,10 +61,11 @@ export default function Dashboard() {
         <LifeGoalsKpi />
       </div>
 
-      {/* Events & Transcripts */}
+      {/* Events & Tickets */}
       <div className="space-y-4">
         <EventbriteMonitor />
         <EventbriteRSVPs />
+        <MyTickets />
         <TranscriptExtractor />
       </div>
 
