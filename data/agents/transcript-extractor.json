@@ -9,7 +9,25 @@
       "id": "1",
       "timestamp": "2026-03-24T20:25:00.000Z",
       "type": "info",
-      "message": "Extract YouTube transcripts when URLs are provided in chat, log to dashboard"
+      "message": "Extract YouTube/TikTok transcripts when URLs are provided in chat, log to dashboard"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-24T17:08:00.000Z",
+      "type": "method",
+      "message": "YouTube: Use youtube-transcript npm package (API, NO browser). Fast (1-2s), accurate, serverless-compatible"
+    },
+    {
+      "id": "3",
+      "timestamp": "2026-03-24T17:08:00.000Z",
+      "type": "method",
+      "message": "TikTok: Use yt-dlp + Whisper CLI (download + AI transcription). Slower (30-60s) but only working method"
+    },
+    {
+      "id": "4",
+      "timestamp": "2026-03-24T17:08:00.000Z",
+      "type": "warning",
+      "message": "DO NOT use browser automation for YouTube - abandoned method. npm package is primary"
     }
   ],
   "developments": [
@@ -62,6 +80,12 @@
       "timestamp": "2026-03-24T20:25:00.000Z",
       "type": "workflow",
       "message": "User prefers pasting links in chat vs using UI input field - cleaner workflow"
+    },
+    {
+      "id": "2",
+      "timestamp": "2026-03-24T17:08:00.000Z",
+      "type": "architecture",
+      "message": "Chat-first workflow: User pastes link → I extract → I provide transcript here → I log to dashboard JSON"
     }
   ],
   "brainstorming": [
