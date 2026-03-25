@@ -4,15 +4,15 @@ import { useState } from 'react';
 
 interface Instruction {
   id: string;
-  timestamp: string;
-  type: string;
+  timestamp?: string;
+  type?: string;
   priority: 'critical' | 'high' | 'medium' | 'low';
   message: string;
 }
 
 interface InstructionsModalProps {
   sectionName: string;
-  instructions: Instruction[];
+  instructions: Partial<Instruction>[];
   trigger?: React.ReactNode;
 }
 
@@ -34,8 +34,8 @@ export function InstructionsModal({ sectionName, instructions, trigger }: Instru
   };
 
   const sortedInstructions = [...instructions].sort((a, b) => {
-    const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-    return priorityOrder[a.priority] - priorityOrder[b.priority];
+    const priorityOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+    return (priorityOrder[a.priority || 'low'] || 3) - (priorityOrder[b.priority || 'low'] || 3);
   });
 
   return (
@@ -83,7 +83,7 @@ export function InstructionsModal({ sectionName, instructions, trigger }: Instru
                 <div className="space-y-3">
                   {/* Group by priority */}
                   {(['critical', 'high', 'medium', 'low'] as const).map((priority) => {
-                    const priorityInstructions = sortedInstructions.filter(i => i.priority === priority);
+                    const priorityInstructions = sortedInstructions.filter(i => (i.priority || 'low') === priority);
                     if (priorityInstructions.length === 0) return null;
                     
                     return (
