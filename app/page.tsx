@@ -6,24 +6,18 @@ import { ActivityFeed } from '@/components/dashboard/activity-feed';
 import { EventbriteMonitor } from '@/components/dashboard/eventbrite-monitor';
 import { TranscriptExtractor } from '@/components/dashboard/transcript-extractor';
 import { MyTickets } from '@/components/dashboard/my-tickets';
-import { SystemCapacity } from '@/components/dashboard/system-capacity';
 import { InstructionsModal } from '@/components/dashboard/instructions-modal';
-import { fetchActivities, fetchSystemHealth } from '@/lib/api';
+import { fetchActivities } from '@/lib/api';
 
 export default function Dashboard() {
   const [activities, setActivities] = useState<any[]>([]);
-  const [systemHealth, setSystemHealth] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [acts, health] = await Promise.all([
-          fetchActivities(),
-          fetchSystemHealth(),
-        ]);
+        const acts = await fetchActivities();
         setActivities(acts);
-        setSystemHealth(health);
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
       } finally {
@@ -86,11 +80,6 @@ export default function Dashboard() {
         <EventbriteMonitor />
         <MyTickets />
         <TranscriptExtractor />
-      </div>
-
-      {/* System Capacity */}
-      <div>
-        {systemHealth && <SystemCapacity health={systemHealth} currentAgents={0} />}
       </div>
 
       {/* Activity Feed */}
