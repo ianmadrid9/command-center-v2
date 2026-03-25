@@ -10,6 +10,7 @@ interface InstructionsModalProps {
     message: string;
   }>;
   lastFollowed?: string;
+  lastRead?: string;
   trigger?: React.ReactNode;
 }
 
@@ -112,9 +113,21 @@ export function InstructionsModal({ sectionName, instructions, lastFollowed, tri
               <p className="text-xs text-muted text-center">
                 I read these instructions before working on this section to ensure I follow the correct workflow.
               </p>
-              {lastFollowed && (
-                <p className="text-[10px] text-muted text-center mt-2 flex items-center justify-center gap-1">
-                  ✅ Last followed: {new Date(lastFollowed).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
+              <div className="mt-2 space-y-1 text-[10px] text-muted text-center flex flex-col items-center gap-1">
+                {lastRead && (
+                  <p className="flex items-center gap-1">
+                    📖 Last read: {new Date(lastRead).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                  </p>
+                )}
+                {lastFollowed && (
+                  <p className="flex items-center gap-1">
+                    ✅ Last followed: {new Date(lastFollowed).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                  </p>
+                )}
+              </div>
+              {!lastRead && !lastFollowed && (
+                <p className="text-[10px] text-muted text-center mt-2">
+                  ⚠️ No activity recorded yet
                 </p>
               )}
             </div>

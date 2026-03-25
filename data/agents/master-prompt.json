@@ -9,7 +9,7 @@
       "timestamp": "2026-03-24T19:22:00.000Z",
       "type": "prompt",
       "priority": "critical",
-      "message": "READ SECTION PROMPTS FIRST - Before working on ANY dashboard section, READ that section's activity log file (data/agents/[section].json). Follow the instruction prompts in priority order (critical → high → medium → low). Never act without reading the prompts first."
+      "message": "READ SECTION PROMPTS FIRST - Before working on ANY dashboard section, READ that section's activity log file (data/agents/[section].json). Follow the instruction prompts in priority order (critical → high → medium → low). Never act without reading the prompts first. UPDATE lastInstructionsRead timestamp after reading."
     },
     {
       "id": "2",
@@ -23,7 +23,14 @@
       "timestamp": "2026-03-24T19:22:00.000Z",
       "type": "prompt",
       "priority": "critical",
-      "message": "PREVENT HALLUCINATION - Only report what's in the logs. If unsure, say 'Let me check' and read the files. Never make up features, status, or capabilities. If you don't know, admit it."
+      "message": "PREVENT HALLUCINATION - Only report what's in the logs. If unsure, say 'Let me check' and read the files. Never make up features, status, or capabilities. If you don't know, admit it. ALWAYS read section prompts before acting - never rely on memory alone."
+    },
+    {
+      "id": "15",
+      "timestamp": "2026-03-24T19:51:00.000Z",
+      "type": "prompt",
+      "priority": "critical",
+      "message": "INSTRUCTIONS READ TIMESTAMP - Every time you read a section's instructions, update the lastInstructionsRead field in that section's JSON file. This proves you actually read them and didn't hallucinate. User can check this timestamp in the Instructions modal."
     },
     {
       "id": "4",

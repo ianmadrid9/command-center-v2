@@ -85,6 +85,7 @@ export function TranscriptExtractor() {
           <InstructionsModal
             sectionName="Transcript Extractor"
             lastFollowed="2026-03-24T19:22:00.000Z"
+            lastRead="2026-03-24T19:51:00.000Z"
             instructions={[
               { id: '2', priority: 'critical', message: 'YouTube: youtube-transcript npm (API, NO browser) - Fast 1-2s' },
               { id: '3', priority: 'critical', message: 'TikTok: yt-dlp + Whisper - Download + AI transcribe (30-60s)' },

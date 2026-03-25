@@ -158,6 +158,7 @@ export function EventbriteMonitor() {
           <InstructionsModal
             sectionName="Eventbrite Monitor"
             lastFollowed="2026-03-24T19:22:00.000Z"
+            lastRead="2026-03-24T19:51:00.000Z"
             instructions={[
               { id: '2', priority: 'critical', message: 'CHECK FOR FREE TICKETS FIRST - Always scan for free tickets, flag with 🎁 FREE badge' },
               { id: '3', priority: 'critical', message: 'PRICE VERIFICATION - Never show unverified prices, mark with ⚠️' },
