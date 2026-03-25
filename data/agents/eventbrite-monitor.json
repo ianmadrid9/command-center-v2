@@ -2,9 +2,9 @@
   "agentId": "eventbrite-monitor",
   "name": "🎫 Eventbrite Monitor",
   "status": "active",
-  "lastRun": "2026-03-25T04:54:00.000Z",
-  "lastInstructionsFollowed": "2026-03-25T04:54:00.000Z",
-  "lastInstructionsRead": "2026-03-25T04:54:00.000Z",
+  "lastRun": "2026-03-25T04:25:00.000Z",
+  "lastInstructionsFollowed": "2026-03-25T04:25:00.000Z",
+  "lastInstructionsRead": "2026-03-25T04:25:00.000Z",
   "nextRun": null,
   "instructions": [
     {
@@ -132,6 +132,12 @@
       "timestamp": "2026-03-25T04:54:00.000Z",
       "type": "status",
       "message": "FREE tickets detection: Working (3 free events found). Price verification: Working. Auto-reserve: Working. Selling fast alerts: TODO"
+    },
+    {
+      "id": "9",
+      "timestamp": "2026-03-25T04:25:00.000Z",
+      "type": "automation",
+      "message": "Auto-reserved 3 FREE events this week: (1) Tech Networking @ Whiskey Cellar (Mar 26), (2) Startup Tech & AI @ East Village (Mar 26), (3) NYC Tech Mixer @ Williamsburg (Mar 27). QR codes pending Eventbrite confirmation emails."
     }
   ],
   "insights": [

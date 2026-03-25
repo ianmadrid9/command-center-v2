@@ -1,4 +1,47 @@
 {
-  "tickets": [],
-  "last_updated": null
+  "tickets": [
+    {
+      "id": "ticket-1774412752900-2",
+      "eventId": "1984089040731",
+      "eventName": "NYC Tech Mixer 2026",
+      "eventDate": "2026-03-27T18:00:00",
+      "venue": "Arlo Williamsburg",
+      "ticketUrl": "https://www.eventbrite.com/e/nyc-tech-mixer-2026-tickets-1984089040731",
+      "isFree": true,
+      "price": "Free",
+      "qrCodeUrl": null,
+      "qrCodeData": null,
+      "status": "reserved",
+      "reservedAt": "2026-03-25T04:25:52.900Z"
+    },
+    {
+      "id": "ticket-1774412752900-1",
+      "eventId": "1984070959650",
+      "eventName": "Startup Tech & AI Networking | Startup Ascent NYC Manhattan",
+      "eventDate": "2026-03-26T18:00:00",
+      "venue": "77 E 7th St",
+      "ticketUrl": "https://www.eventbrite.com/e/startup-tech-ai-networking-startup-ascent-nyc-manhattan-tickets-1984070959650",
+      "isFree": true,
+      "price": "Free",
+      "qrCodeUrl": null,
+      "qrCodeData": null,
+      "status": "reserved",
+      "reservedAt": "2026-03-25T04:25:52.900Z"
+    },
+    {
+      "id": "ticket-1774412752890-0",
+      "eventId": "1982871903240",
+      "eventName": "Tech Networking Event by Startup Valley in NYC Manhattan",
+      "eventDate": "2026-03-26T18:00:00",
+      "venue": "Whiskey Cellar NYC",
+      "ticketUrl": "https://www.eventbrite.com/e/tech-networking-event-by-startup-valley-in-nyc-manhattan-tickets-1982871903240",
+      "isFree": true,
+      "price": "Free",
+      "qrCodeUrl": null,
+      "qrCodeData": null,
+      "status": "reserved",
+      "reservedAt": "2026-03-25T04:25:52.890Z"
+    }
+  ],
+  "last_updated": "2026-03-25T04:25:52.900Z"
 }

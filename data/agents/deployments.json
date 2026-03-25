@@ -75,6 +75,12 @@
       "timestamp": "2026-03-25T03:10:00.000Z",
       "type": "deployment",
       "message": "My Tickets redesigned: Collapsed KPI row + expanded QR details"
+    },
+    {
+      "id": "8",
+      "timestamp": "2026-03-25T04:25:00.000Z",
+      "type": "automation",
+      "message": "Auto-reserved 3 FREE events this week (full automation workflow - no user confirmation needed for FREE events)"
     }
   ],
   "insights": [
