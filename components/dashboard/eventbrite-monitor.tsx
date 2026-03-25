@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { InstructionsModal } from './instructions-modal';
 
 interface EventbriteEvent {
   id: string;
@@ -121,14 +122,35 @@ export function EventbriteMonitor() {
             </p>
           </div>
         </div>
-        <a
-          href="https://www.eventbrite.com/d/ny--new-york/tech-networking--events/?price=t"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-accent hover:underline flex items-center gap-1"
-        >
-          Browse More ↗
-        </a>
+        <div className="flex items-center gap-2">
+          <InstructionsModal
+            sectionName="Eventbrite Monitor"
+            instructions={[
+              { id: '2', timestamp: '', type: 'prompt', priority: 'critical', message: 'CHECK FOR FREE TICKETS FIRST - Always scan events for free ticket availability. If any event has free tickets, flag it immediately with 🎁 FREE badge' },
+              { id: '3', timestamp: '', type: 'prompt', priority: 'critical', message: 'PRICE VERIFICATION REQUIRED - Never show prices without verifying they're current. Mark unverified prices with ⚠️. Check event page for latest pricing before displaying' },
+              { id: '9', timestamp: '', type: 'prompt', priority: 'critical', message: 'QR CODE WORKFLOW - When user reserves free/early bird ticket: (1) Use managed browser to book on Eventbrite, (2) Scrape QR code from confirmation page/email, (3) Save to data/eventbrite-tickets.json, (4) Display in My Tickets section' },
+              { id: '4', timestamp: '', type: 'prompt', priority: 'high', message: 'EARLY BIRD DETECTION - Identify and badge early bird pricing opportunities. Show deadline if available' },
+              { id: '5', timestamp: '', type: 'prompt', priority: 'high', message: 'SELLING FAST ALERTS - Monitor ticket availability. If <20% tickets remaining or event marked "selling fast", add 🔥 badge' },
+              { id: '10', timestamp: '', type: 'prompt', priority: 'high', message: 'AUTO-RESERVE BUTTON - For FREE events, show "🎁 Reserve Now" button. On click: book via browser automation, save QR code, add to My Tickets' },
+              { id: '6', timestamp: '', type: 'prompt', priority: 'medium', message: 'AI INSIGHTS CATEGORIES - Categorize each event as: Worth Going (must-attend), Consider It (maybe), Skip This (not valuable). Provide 1-sentence reasoning' },
+              { id: '7', timestamp: '', type: 'prompt', priority: 'medium', message: 'COLLAPSIBLE WEEKS - Group events by "This Week" and "Next Week". Collapsed by default to reduce clutter' },
+              { id: '8', timestamp: '', type: 'prompt', priority: 'low', message: "I'LL ATTEND CALENDAR - Allow user to mark events they'll attend. Store in data/eventbrite-rsvps.json and show in RSVPs section" },
+            ]}
+            trigger={
+              <button className="text-xs text-muted hover:text-accent transition-colors flex items-center gap-1" title="View section instructions">
+                📋
+              </button>
+            }
+          />
+          <a
+            href="https://www.eventbrite.com/d/ny--new-york/tech-networking--events/?price=t"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-accent hover:underline flex items-center gap-1"
+          >
+            Browse More ↗
+          </a>
+        </div>
       </div>
 
       {events.length === 0 ? (

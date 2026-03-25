@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { InstructionsModal } from './instructions-modal';
 
 interface Transcript {
   id: string;
@@ -75,9 +76,28 @@ export function TranscriptExtractor() {
           <span className="text-xl">📝</span>
           <h3 className="font-medium">Transcript Log</h3>
         </div>
-        <span className="text-xs text-muted">
-          {transcripts.filter(t => t.status === 'completed').length} transcripts
-        </span>
+        <div className="flex items-center gap-2">
+          <InstructionsModal
+            sectionName="Transcript Extractor"
+            instructions={[
+              { id: '2', timestamp: '', type: 'method', priority: 'critical', message: 'YouTube: Use youtube-transcript npm package (API, NO browser). Fast (1-2s), accurate, serverless-compatible' },
+              { id: '3', timestamp: '', type: 'method', priority: 'critical', message: 'TikTok: Use yt-dlp + Whisper CLI (download + AI transcription). Slower (30-60s) but only working method' },
+              { id: '4', timestamp: '', type: 'warning', priority: 'critical', message: 'DO NOT use browser automation for YouTube - abandoned method. npm package is primary' },
+              { id: '5', timestamp: '', type: 'prompt', priority: 'high', message: 'CHAT-FIRST WORKFLOW - User pastes link in chat → Extract immediately → Provide transcript in chat → Log to dashboard JSON. Do NOT wait for user to ask' },
+              { id: '6', timestamp: '', type: 'prompt', priority: 'high', message: 'LOG EVERY TRANSCRIPT - Save every extracted transcript to data/transcripts.json with: id, url, title, author, duration, platform, transcript text, timestamp, language, segments count' },
+              { id: '7', timestamp: '', type: 'prompt', priority: 'medium', message: 'LANGUAGE DETECTION - Whisper auto-detects language. Record detected language in transcript metadata. For non-English, note it in the transcript' },
+              { id: '8', timestamp: '', type: 'prompt', priority: 'medium', message: 'ERROR HANDLING - If video unavailable/no captions, tell user immediately with specific error (e.g., "Video deleted", "No captions enabled"). Do not retry endlessly' },
+            ]}
+            trigger={
+              <button className="text-xs text-muted hover:text-accent transition-colors" title="View section instructions">
+                📋
+              </button>
+            }
+          />
+          <span className="text-xs text-muted">
+            {transcripts.filter(t => t.status === 'completed').length} transcripts
+          </span>
+        </div>
       </div>
 
       <div className="mb-4 p-3 rounded-xl bg-slate-800/50 border border-border/50">
