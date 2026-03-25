@@ -75,6 +75,35 @@ export function EventbriteMonitor() {
     return '📅';
   }
 
+  async function handleReserve(event: EventbriteEvent) {
+    try {
+      // Call API to reserve ticket via browser automation
+      const res = await fetch('/api/eventbrite/reserve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventId: event.id,
+          eventName: event.name,
+          eventDate: event.start,
+          venue: event.venue?.name || '',
+          ticketUrl: event.url,
+          isFree: event.is_free,
+          price: event.price || 'Free',
+        }),
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        alert(`✅ Reserved! QR code will appear in "My Tickets" section once confirmed.`);
+      } else {
+        alert(`❌ Reservation failed: ${data.error || 'Unknown error'}`);
+      }
+    } catch (error: any) {
+      alert(`❌ Reservation failed: ${error.message}`);
+    }
+  }
+
   if (loading) {
     return (
       <div className="card p-5 w-full">
@@ -191,7 +220,17 @@ export function EventbriteMonitor() {
                           {event.is_free ? '🆓 Free' : '💰 You Pay'}
                         </span>
                       </div>
-                      {!event.is_free && (
+                      {event.is_free ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleReserve(event);
+                          }}
+                          className="text-xs bg-accent text-slate-950 px-2 py-0.5 rounded-full font-medium hover:bg-accent/90 transition-colors"
+                        >
+                          🎫 Reserve
+                        </button>
+                      ) : (
                         <span className="text-xs text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">
                           ⚠️ Settle yourself
                         </span>
