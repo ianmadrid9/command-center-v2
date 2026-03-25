@@ -9,11 +9,11 @@ export function LifeGoalsKpi() {
         <span className="text-3xl">🎯</span>
         <div>
           <h3 className="font-semibold text-lg">Life Goals</h3>
-          <p className="text-sm text-muted">Activity log available</p>
+          <p className="text-sm text-muted">Coming soon</p>
         </div>
       </div>
       <p className="text-muted text-sm">
-        Life Goals tracking is being set up. Click the Activity Logs section to view progress.
+        Life Goals tracking is being set up.
       </p>
     </div>
   );
